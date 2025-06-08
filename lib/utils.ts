@@ -1,9 +1,38 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { Position } from "@/types"
+import { Position, Robot, Task } from "@/types"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
+}
+
+/**
+ * Check if a cell is occupied by a robot or task
+ * @param row Row position to check
+ * @param col Column position to check
+ * @param robots Array of robots
+ * @param tasks Array of tasks
+ * @returns true if the cell is occupied
+ */
+export function isCellOccupied(
+  row: number, 
+  col: number, 
+  robots: Robot[], 
+  tasks: Task[]
+): boolean {
+  // Check if any robot is at this position
+  const robotAtPosition = robots.some(robot => {
+    const [robotRow, robotCol] = robot.position
+    return robotRow === row && robotCol === col
+  })
+
+  // Check if any task is at this position
+  const taskAtPosition = tasks.some(task => {
+    const [taskRow, taskCol] = task.position
+    return taskRow === row && taskCol === col
+  })
+
+  return robotAtPosition || taskAtPosition
 }
 
 /**

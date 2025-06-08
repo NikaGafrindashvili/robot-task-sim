@@ -1,5 +1,5 @@
-import { calculateManhattanDistance, findPath } from '../utils'
-import { Position } from '@/types'
+import { calculateManhattanDistance, findPath, isCellOccupied } from '../../lib/utils'
+import { Position, Robot, Task } from '../../types'
 
 describe('Pathfinding Utilities', () => {
   describe('calculateManhattanDistance', () => {
@@ -177,6 +177,39 @@ describe('Pathfinding Utilities', () => {
       
       expect(path.length).toBe(18) // 9 + 9 = 18 steps
       expect(path[path.length - 1]).toEqual([9, 9])
+    })
+  })
+
+  describe('isCellOccupied', () => {
+    const robots: Robot[] = [
+      { id: '1', position: [0, 0] },
+      { id: '2', position: [2, 3] }
+    ]
+
+    const tasks: Task[] = [
+      { id: '1', position: [1, 1], assigned: false },
+      { id: '2', position: [3, 2], assigned: true }
+    ]
+
+    it('should return true when cell is occupied by a robot', () => {
+      expect(isCellOccupied(0, 0, robots, tasks)).toBe(true)
+      expect(isCellOccupied(2, 3, robots, tasks)).toBe(true)
+    })
+
+    it('should return true when cell is occupied by a task', () => {
+      expect(isCellOccupied(1, 1, robots, tasks)).toBe(true)
+      expect(isCellOccupied(3, 2, robots, tasks)).toBe(true)
+    })
+
+    it('should return false when cell is empty', () => {
+      expect(isCellOccupied(0, 1, robots, tasks)).toBe(false)
+      expect(isCellOccupied(4, 4, robots, tasks)).toBe(false)
+    })
+
+    it('should work with empty arrays', () => {
+      expect(isCellOccupied(0, 0, [], [])).toBe(false)
+      expect(isCellOccupied(1, 1, [], tasks)).toBe(true)
+      expect(isCellOccupied(0, 0, robots, [])).toBe(true)
     })
   })
 }) 
