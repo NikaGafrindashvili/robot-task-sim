@@ -27,7 +27,7 @@ describe('SimulationStore', () => {
       store.addRobot(initialPos)
       
       // Get the robot that was added
-      const robot = store.robots[0]
+      const robot = useSimulationStore.getState().robots[0]
       expect(robot.position).toEqual([0, 0])
       
       // Move the robot
