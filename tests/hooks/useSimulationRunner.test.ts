@@ -165,7 +165,7 @@ describe('useSimulationRunner', () => {
     
     // Add robot without path
     store.addRobot([0, 0])
-    const robot = store.robots[0]
+    const robot = useSimulationStore.getState().robots[0]
     const initialPosition = robot.position
     
     renderHook(() => useSimulationRunner())
@@ -190,7 +190,7 @@ describe('useSimulationRunner', () => {
     
     // Add robot with single-step path
     store.addRobot([0, 0])
-    const robot = store.robots[0]
+    const robot = useSimulationStore.getState().robots[0]
     store.moveRobot(robot.id, [0, 0], [[0, 1]]) // Only one step in path
     
     renderHook(() => useSimulationRunner())
@@ -228,7 +228,7 @@ describe('useSimulationRunner', () => {
     store.addRobot([1, 0])
     store.addRobot([2, 0])
     
-    const robots = store.robots
+    const robots = useSimulationStore.getState().robots
     
     // Give path to only first two robots
     store.moveRobot(robots[0].id, [0, 0], [[0, 1]])
@@ -245,7 +245,7 @@ describe('useSimulationRunner', () => {
     
     // Add robot with path
     store.addRobot([0, 0])
-    const robot = store.robots[0]
+    const robot = useSimulationStore.getState().robots[0]
     store.moveRobot(robot.id, [0, 0], [[0, 1]])
     
     const { result } = renderHook(() => useSimulationRunner())
