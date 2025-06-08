@@ -49,7 +49,7 @@ describe('SimulationStore', () => {
       
       // Add a robot with an initial path
       store.addRobot([0, 0])
-      const robot = store.robots[0]
+      const robot = useSimulationStore.getState().robots[0]
       
       // Give the robot a path first
       store.moveRobot(robot.id, [0, 1], [[0, 2], [0, 3]])
@@ -72,7 +72,7 @@ describe('SimulationStore', () => {
       store.addRobot([0, 0])
       store.addRobot([1, 1])
       
-      const robots = store.robots
+      const robots = useSimulationStore.getState().robots
       expect(robots).toHaveLength(2)
       
       const robot1 = robots[0]
@@ -99,7 +99,7 @@ describe('SimulationStore', () => {
       
       // Add one robot
       store.addRobot([0, 0])
-      const initialRobots = store.robots
+      const initialRobots = useSimulationStore.getState().robots
       
       // Try to move a robot that doesn't exist
       store.moveRobot('non-existent-id', [1, 1], [[2, 2]])
@@ -114,10 +114,10 @@ describe('SimulationStore', () => {
       
       // Add a robot
       store.addRobot([0, 0])
-      const robot = store.robots[0]
+      const robot = useSimulationStore.getState().robots[0]
       
       // Manually set some properties to test they're preserved
-      const robotsWithTargetTask = store.robots.map(r => ({
+      const robotsWithTargetTask = useSimulationStore.getState().robots.map(r => ({
         ...r,
         targetTaskId: r.id === robot.id ? 'task-123' : r.targetTaskId
       }))
