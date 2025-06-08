@@ -41,7 +41,8 @@ describe('useSimulationRunner', () => {
     
     // Add a robot with a path
     store.addRobot([0, 0])
-    const robot = store.robots[0]
+    const currentState = useSimulationStore.getState()
+    const robot = currentState.robots[0]
     store.moveRobot(robot.id, [0, 0], [[0, 1], [0, 2]]) // Give it a path
     
     const { result } = renderHook(() => useSimulationRunner())
@@ -91,7 +92,7 @@ describe('useSimulationRunner', () => {
     
     // Add robot with path
     store.addRobot([0, 0])
-    const robot = store.robots[0]
+    const robot = useSimulationStore.getState().robots[0]
     store.moveRobot(robot.id, [0, 0], [[0, 1], [0, 2]])
     
     renderHook(() => useSimulationRunner())
@@ -130,7 +131,7 @@ describe('useSimulationRunner', () => {
     store.addRobot([0, 0])
     store.addRobot([1, 0])
     
-    const robots = store.robots
+    const robots = useSimulationStore.getState().robots
     const robot1 = robots[0]
     const robot2 = robots[1]
     

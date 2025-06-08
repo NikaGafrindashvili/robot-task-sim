@@ -4,7 +4,7 @@ const tsJestTransformCfg = createDefaultPreset().transform;
 
 /** @type {import("jest").Config} **/
 module.exports = {
-  testEnvironment: "node",
+  testEnvironment: "jsdom", // Changed to jsdom for React hooks testing
   transform: {
     ...tsJestTransformCfg,
   },
