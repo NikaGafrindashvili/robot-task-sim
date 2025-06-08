@@ -41,6 +41,7 @@ interface SimulationState {
   startSimulation: () => void
   pauseSimulation: () => void
   resetSimulation: () => void
+  moveRobot: (robotId: string, nextPosition: Position, remainingPath: Position[]) => void
 }
 
 export const useSimulationStore = create<SimulationState>((set, get) => ({
@@ -146,6 +147,21 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
       dynamicTaskSpawning: false,
       gridSize,
     })
+  },
+
+  moveRobot: (robotId, nextPosition, remainingPath) => {
+    const { robots } = get()
+    const updatedRobots = robots.map(robot => {
+      if (robot.id === robotId) {
+        return {
+          ...robot,
+          position: nextPosition,
+          path: remainingPath.length > 0 ? remainingPath : null,
+        }
+      }
+      return robot
+    })
+    set({ robots: updatedRobots })
   },
 }))
 
