@@ -85,20 +85,18 @@ export function findPath(
   gridSize: Position, 
   obstacles: Position[] = []
 ): Position[] {
-  console.log(`findPath: start=[${startPos[0]},${startPos[1]}] end=[${endPos[0]},${endPos[1]}] gridSize=[${gridSize[0]},${gridSize[1]}] obstacles=${obstacles.length}`)
-  
+  // If start and end are the same, no movement needed
   if (startPos[0] === endPos[0] && startPos[1] === endPos[1]) {
-    console.log('findPath: start and end are the same, returning empty path')
     return []
   }
 
+  // Check if positions are within grid bounds
   if (!isInBounds(startPos, gridSize) || !isInBounds(endPos, gridSize)) {
-    console.log('findPath: start or end position out of bounds')
     return []
   }
 
+  // Check if start or end positions are blocked by obstacles
   if (isObstacle(startPos, obstacles) || isObstacle(endPos, obstacles)) {
-    console.log('findPath: start or end position is an obstacle')
     return []
   }
 
