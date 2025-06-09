@@ -34,9 +34,6 @@ export function useSimulationRunner() {
 
     // Step 1: Assign tasks to idle robots
     if (strategy === 'nearest') {
-      // Prepare obstacles (all robots and tasks positions)
-      const obstacles = getObstaclePositions(robots, tasks)
-      
       // Filter idle robots and unassigned tasks
       const idleRobots = robots.filter(robot => !robot.targetTaskId)
       const unassignedTasks = tasks.filter(task => !task.assigned)
@@ -45,7 +42,7 @@ export function useSimulationRunner() {
       
       // Only run assignment if there are idle robots and unassigned tasks
       if (idleRobots.length > 0 && unassignedTasks.length > 0) {
-        const assignments = assignTasksNearestFirst(robots, tasks, gridSize, obstacles)
+        const assignments = assignTasksNearestFirst(robots, tasks, gridSize)
         console.log('Debug - Assignments made:', assignments.length)
         
         // Apply each assignment

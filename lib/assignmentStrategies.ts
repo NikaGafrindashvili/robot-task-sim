@@ -23,8 +23,7 @@ export interface TaskAssignment {
 export function assignTasksNearestFirst(
   robots: Robot[],
   tasks: Task[],
-  gridSize: Position,
-  obstacles: Position[] = []
+  gridSize: Position
 ): TaskAssignment[] {
   const assignments: TaskAssignment[] = []
   
@@ -54,8 +53,9 @@ export function assignTasksNearestFirst(
       
       // Only consider this task if it's closer than current best
       if (distance < shortestDistance) {
-        // Calculate path to this task
-        const path = findPath(robot.position, task.position, gridSize, obstacles)
+        // Calculate path to this task (exclude this robot and task from obstacles)
+        const pathObstacles = getObstaclePositions(robots, tasks, robot.id, task.id)
+        const path = findPath(robot.position, task.position, gridSize, pathObstacles)
         console.log(`Debug - Path from [${robot.position[0]},${robot.position[1]}] to [${task.position[0]},${task.position[1]}] : ${path.length} steps`)
         
         // If a valid path exists, this could be our best option

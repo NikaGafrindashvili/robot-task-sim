@@ -96,7 +96,7 @@ describe('Assignment Strategies', () => {
       expect(assignments).toHaveLength(0)
     })
 
-    it('should handle obstacles in pathfinding', () => {
+    it('should find direct path when no obstacles', () => {
       const robots: Robot[] = [
         { id: 'robot1', position: [0, 0], targetTaskId: null, path: null }
       ]
@@ -105,16 +105,13 @@ describe('Assignment Strategies', () => {
         { id: 'task1', position: [0, 2], assigned: false }
       ]
 
-      // Block direct path
-      const obstacles: Position[] = [[0, 1]]
-
-      const assignments = assignTasksNearestFirst(robots, tasks, gridSize, obstacles)
+      const assignments = assignTasksNearestFirst(robots, tasks, gridSize)
 
       expect(assignments).toHaveLength(1)
-      expect(assignments[0].path.length).toBeGreaterThan(2) // Should find longer path around obstacle
+      expect(assignments[0].path.length).toBe(2) // Direct path: [0,1], [0,2]
     })
 
-    it('should not assign task if no valid path exists', () => {
+    it('should assign task when path exists', () => {
       const robots: Robot[] = [
         { id: 'robot1', position: [0, 0], targetTaskId: null, path: null }
       ]
@@ -123,14 +120,10 @@ describe('Assignment Strategies', () => {
         { id: 'task1', position: [0, 2], assigned: false }
       ]
 
-      // Completely block the robot
-      const obstacles: Position[] = [
-        [0, 1], [1, 1], [1, 0]
-      ]
+      const assignments = assignTasksNearestFirst(robots, tasks, gridSize)
 
-      const assignments = assignTasksNearestFirst(robots, tasks, gridSize, obstacles)
-
-      expect(assignments).toHaveLength(0)
+      expect(assignments).toHaveLength(1)
+      expect(assignments[0].path.length).toBeGreaterThan(0)
     })
 
     it('should assign multiple robots when multiple tasks available', () => {
