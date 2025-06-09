@@ -41,12 +41,16 @@ export function useSimulationRunner() {
       const idleRobots = robots.filter(robot => !robot.targetTaskId)
       const unassignedTasks = tasks.filter(task => !task.assigned)
       
+      console.log('Debug - Idle robots:', idleRobots.length, 'Unassigned tasks:', unassignedTasks.length)
+      
       // Only run assignment if there are idle robots and unassigned tasks
       if (idleRobots.length > 0 && unassignedTasks.length > 0) {
         const assignments = assignTasksNearestFirst(robots, tasks, gridSize, obstacles)
+        console.log('Debug - Assignments made:', assignments.length)
         
         // Apply each assignment
         assignments.forEach(assignment => {
+          console.log('Debug - Assigning robot', assignment.robotId, 'to task', assignment.taskId, 'with path length', assignment.path.length)
           assignTaskToRobot(assignment.robotId, assignment.taskId, assignment.path)
         })
       }
@@ -54,14 +58,19 @@ export function useSimulationRunner() {
 
     // Step 2: Move robots that have paths
     const updatedState = useSimulationStore.getState()
+    const robotsWithPaths = updatedState.robots.filter(robot => robot.path && robot.path.length > 0)
+    console.log('Debug - Robots with paths:', robotsWithPaths.length)
+    
     updatedState.robots.forEach(robot => {
       if (robot.path && robot.path.length > 0) {
+        console.log('Debug - Moving robot', robot.id, 'from', robot.position, 'to', robot.path[0])
         const nextPosition = robot.path[0]
         const remainingPath = robot.path.slice(1)
         moveRobot(robot.id, nextPosition, remainingPath)
         
        
         if (remainingPath.length === 0 && robot.targetTaskId) {
+          console.log('Debug - Robot', robot.id, 'completed task', robot.targetTaskId)
           completeTask(robot.id, robot.targetTaskId)
         }
       }

@@ -56,6 +56,7 @@ export function assignTasksNearestFirst(
       if (distance < shortestDistance) {
         // Calculate path to this task
         const path = findPath(robot.position, task.position, gridSize, obstacles)
+        console.log(`Debug - Path from [${robot.position[0]},${robot.position[1]}] to [${task.position[0]},${task.position[1]}] : ${path.length} steps`)
         
         // If a valid path exists, this could be our best option
         if (path.length > 0) {
