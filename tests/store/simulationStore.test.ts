@@ -136,6 +136,121 @@ describe('SimulationStore', () => {
     })
   })
 
+  describe('assignTaskToRobot', () => {
+    it('should assign task to robot with path', () => {
+      const store = useSimulationStore.getState()
+      
+      // Add robot and task
+      store.addRobot([0, 0])
+      store.addTask([2, 2])
+      
+      const robot = useSimulationStore.getState().robots[0]
+      const task = useSimulationStore.getState().tasks[0]
+      const path: Position[] = [[0, 1], [1, 1], [2, 2]]
+      
+      // Assign task to robot
+      store.assignTaskToRobot(robot.id, task.id, path)
+      
+      const updatedState = useSimulationStore.getState()
+      const updatedRobot = updatedState.robots[0]
+      const updatedTask = updatedState.tasks[0]
+      
+      // Robot should have target and path
+      expect(updatedRobot.targetTaskId).toBe(task.id)
+      expect(updatedRobot.path).toEqual(path)
+      
+      // Task should be marked as assigned
+      expect(updatedTask.assigned).toBe(true)
+    })
+
+    it('should handle empty path assignment', () => {
+      const store = useSimulationStore.getState()
+      
+      store.addRobot([0, 0])
+      store.addTask([2, 2])
+      
+      const robot = useSimulationStore.getState().robots[0]
+      const task = useSimulationStore.getState().tasks[0]
+      
+      // Assign with empty path
+      store.assignTaskToRobot(robot.id, task.id, [])
+      
+      const updatedRobot = useSimulationStore.getState().robots[0]
+      const updatedTask = useSimulationStore.getState().tasks[0]
+      
+      expect(updatedRobot.targetTaskId).toBe(task.id)
+      expect(updatedRobot.path).toBeNull()
+      expect(updatedTask.assigned).toBe(true)
+    })
+
+    it('should not affect other robots or tasks', () => {
+      const store = useSimulationStore.getState()
+      
+      // Add multiple robots and tasks
+      store.addRobot([0, 0])
+      store.addRobot([5, 5])
+      store.addTask([2, 2])
+      store.addTask([7, 7])
+      
+      const state = useSimulationStore.getState()
+      const robot1 = state.robots[0]
+      const robot2 = state.robots[1]
+      const task1 = state.tasks[0]
+      const task2 = state.tasks[1]
+      
+      // Assign only first robot to first task
+      store.assignTaskToRobot(robot1.id, task1.id, [[1, 1], [2, 2]])
+      
+      const updatedState = useSimulationStore.getState()
+      const updatedRobot1 = updatedState.robots.find(r => r.id === robot1.id)
+      const updatedRobot2 = updatedState.robots.find(r => r.id === robot2.id)
+      const updatedTask1 = updatedState.tasks.find(t => t.id === task1.id)
+      const updatedTask2 = updatedState.tasks.find(t => t.id === task2.id)
+      
+      // Robot1 and Task1 should be updated
+      expect(updatedRobot1!.targetTaskId).toBe(task1.id)
+      expect(updatedTask1!.assigned).toBe(true)
+      
+      // Robot2 and Task2 should be unchanged
+      expect(updatedRobot2!.targetTaskId).toBeNull()
+      expect(updatedTask2!.assigned).toBe(false)
+    })
+
+    it('should handle non-existent robot gracefully', () => {
+      const store = useSimulationStore.getState()
+      
+      store.addTask([2, 2])
+      const task = useSimulationStore.getState().tasks[0]
+      const initialState = useSimulationStore.getState()
+      
+      // Try to assign to non-existent robot
+      store.assignTaskToRobot('non-existent-robot', task.id, [[1, 1]])
+      
+      const finalState = useSimulationStore.getState()
+      
+      // Task should still be marked as assigned (this is the current behavior)
+      expect(finalState.tasks[0].assigned).toBe(true)
+      expect(finalState.robots).toEqual(initialState.robots)
+    })
+
+    it('should handle non-existent task gracefully', () => {
+      const store = useSimulationStore.getState()
+      
+      store.addRobot([0, 0])
+      const robot = useSimulationStore.getState().robots[0]
+      const initialState = useSimulationStore.getState()
+      
+      // Try to assign non-existent task
+      store.assignTaskToRobot(robot.id, 'non-existent-task', [[1, 1]])
+      
+      const finalState = useSimulationStore.getState()
+      
+      // Robot should still be updated (this is the current behavior)
+      expect(finalState.robots[0].targetTaskId).toBe('non-existent-task')
+      expect(finalState.tasks).toEqual(initialState.tasks)
+    })
+  })
+
   describe('basic store operations', () => {
     it('should add robots correctly', () => {
       const store = useSimulationStore.getState()

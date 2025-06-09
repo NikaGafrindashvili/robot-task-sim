@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useSimulationStore } from '@/store/simulationStore'
+import { assignTasksNearestFirst, getObstaclePositions } from '@/lib/assignmentStrategies'
 
 export function useSimulationRunner() {
   const intervalRef = useRef<NodeJS.Timeout | null>(null)

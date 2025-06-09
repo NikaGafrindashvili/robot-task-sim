@@ -42,6 +42,7 @@ interface SimulationState {
   pauseSimulation: () => void
   resetSimulation: () => void
   moveRobot: (robotId: string, nextPosition: Position, remainingPath: Position[]) => void
+  assignTaskToRobot: (robotId: string, taskId: string, path: Position[]) => void
 }
 
 export const useSimulationStore = create<SimulationState>((set, get) => ({
@@ -162,6 +163,31 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
       return robot
     })
     set({ robots: updatedRobots })
+  },
+  assignTaskToRobot: (robotId, taskId, path) => {
+    const { robots, tasks } = get()
+    
+    // Update robot with target task and path
+    const updatedRobots = robots.map(robot => {
+      if (robot.id === robotId) {
+        return {
+          ...robot,
+          targetTaskId: taskId,
+          path: path.length > 0 ? [...path] : null,
+        }
+      }
+      return robot
+    })
+    
+    // Mark task as assigned
+    const updatedTasks = tasks.map(task => {
+      if (task.id === taskId) {
+        return { ...task, assigned: true }
+      }
+      return task
+    })
+    
+    set({ robots: updatedRobots, tasks: updatedTasks })
   },
 }))
 
