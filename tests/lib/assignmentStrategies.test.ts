@@ -1,5 +1,5 @@
 import { assignTasksNearestFirst, getObstaclePositions } from '../../lib/assignmentStrategies'
-import { Position, Robot, Task } from '../../types'
+import { Position, Robot, Task } from '../../store/simulationStore'
 
 describe('Assignment Strategies', () => {
   const gridSize: Position = [10, 10]
@@ -154,8 +154,8 @@ describe('Assignment Strategies', () => {
       const robotIds = assignments.map(a => a.robotId)
       const taskIds = assignments.map(a => a.taskId)
       
-      expect(new Set(robotIds)).toHaveSize(3)
-      expect(new Set(taskIds)).toHaveSize(3)
+      expect(new Set(robotIds).size).toBe(3)
+      expect(new Set(taskIds).size).toBe(3)
     })
 
     it('should handle more robots than tasks', () => {

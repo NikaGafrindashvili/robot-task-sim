@@ -9,7 +9,11 @@ export function useSimulationRunner() {
     isRunning, 
     tickSpeed, 
     robots, 
-    moveRobot 
+    tasks,
+    strategy,
+    gridSize,
+    moveRobot,
+    assignTaskToRobot
   } = useSimulationStore()
 
   
@@ -25,16 +29,35 @@ export function useSimulationRunner() {
   
   const tick = () => {
     const currentState = useSimulationStore.getState()
-    const { robots } = currentState
+    const { robots, tasks, strategy, gridSize } = currentState
 
-
-    robots.forEach(robot => {
-      if (robot.path && robot.path.length > 0) {
+    // Step 1: Assign tasks to idle robots
+    if (strategy === 'nearest') {
+      // Prepare obstacles (all robots and tasks positions)
+      const obstacles = getObstaclePositions(robots, tasks)
+      
+      // Filter idle robots and unassigned tasks
+      const idleRobots = robots.filter(robot => !robot.targetTaskId)
+      const unassignedTasks = tasks.filter(task => !task.assigned)
+      
+      // Only run assignment if there are idle robots and unassigned tasks
+      if (idleRobots.length > 0 && unassignedTasks.length > 0) {
+        const assignments = assignTasksNearestFirst(robots, tasks, gridSize, obstacles)
         
+        // Apply each assignment
+        assignments.forEach(assignment => {
+          assignTaskToRobot(assignment.robotId, assignment.taskId, assignment.path)
+        })
+      }
+    }
+
+    // Step 2: Move robots that have paths
+    const updatedState = useSimulationStore.getState()
+    updatedState.robots.forEach(robot => {
+      if (robot.path && robot.path.length > 0) {
         const nextPosition = robot.path[0]
         const remainingPath = robot.path.slice(1)
-        
-                moveRobot(robot.id, nextPosition, remainingPath)
+        moveRobot(robot.id, nextPosition, remainingPath)
       }
     })
   }

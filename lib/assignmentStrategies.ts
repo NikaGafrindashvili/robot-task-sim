@@ -1,4 +1,4 @@
-import { Position, Robot, Task } from '@/types'
+import { Position, Robot, Task } from '@/store/simulationStore'
 import { calculateManhattanDistance, findPath } from './utils'
 
 /**
