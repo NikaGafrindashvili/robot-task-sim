@@ -13,7 +13,8 @@ export function useSimulationRunner() {
     strategy,
     gridSize,
     moveRobot,
-    assignTaskToRobot
+    assignTaskToRobot,
+    completeTask
   } = useSimulationStore()
 
   
@@ -58,6 +59,11 @@ export function useSimulationRunner() {
         const nextPosition = robot.path[0]
         const remainingPath = robot.path.slice(1)
         moveRobot(robot.id, nextPosition, remainingPath)
+        
+       
+        if (remainingPath.length === 0 && robot.targetTaskId) {
+          completeTask(robot.id, robot.targetTaskId)
+        }
       }
     })
   }
