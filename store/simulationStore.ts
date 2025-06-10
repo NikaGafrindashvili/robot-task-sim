@@ -27,6 +27,7 @@ interface SimulationState {
   strategy: Strategy
   isRunning: boolean
   dynamicTaskSpawning: boolean
+  lastAssignedRobotIndex: number
 
   // Actions
   setGridSize: (size: [number, number]) => void
@@ -44,6 +45,7 @@ interface SimulationState {
   moveRobot: (robotId: string, nextPosition: Position, remainingPath: Position[]) => void
   assignTaskToRobot: (robotId: string, taskId: string, path: Position[]) => void
   completeTask: (robotId: string, taskId: string) => void
+  setLastAssignedRobotIndex: (index: number) => void
 }
 
 export const useSimulationStore = create<SimulationState>((set, get) => ({
@@ -54,6 +56,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   strategy: 'nearest',
   isRunning: false,
   dynamicTaskSpawning: false,
+  lastAssignedRobotIndex: -1,
 
   setGridSize: (size) => set({ gridSize: size }),
 
@@ -148,8 +151,11 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
       tasks: [],
       dynamicTaskSpawning: false,
       gridSize,
+      lastAssignedRobotIndex: -1,
     })
   },
+
+  setLastAssignedRobotIndex: (index) => set({ lastAssignedRobotIndex: index }),
 
   moveRobot: (robotId, nextPosition, remainingPath) => {
     const { robots } = get()
