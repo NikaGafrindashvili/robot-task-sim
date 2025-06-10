@@ -118,4 +118,91 @@ export function getObstaclePositions(
   })
   
   return obstacles
+}
+
+/**
+ * Assigns tasks to robots using the round-robin strategy
+ * Cycles through robots in order, assigning the nearest task to each robot in turn
+ * 
+ * @param robots Array of robots
+ * @param tasks Array of tasks
+ * @param gridSize Grid dimensions [rows, cols]
+ * @param lastAssignedRobotIndex Index of the last robot that was assigned a task
+ * @returns Object containing assignments array and updated lastAssignedRobotIndex
+ */
+export function assignTasksRoundRobin(
+  robots: Robot[],
+  tasks: Task[],
+  gridSize: Position,
+  lastAssignedRobotIndex: number
+): { assignments: TaskAssignment[], nextRobotIndex: number } {
+  const assignments: TaskAssignment[] = []
+  
+  // Filter idle robots and unassigned tasks
+  const idleRobots = robots.filter(robot => !robot.targetTaskId)
+  const unassignedTasks = tasks.filter(task => !task.assigned)
+  
+  // If no idle robots or no unassigned tasks, return empty assignments
+  if (idleRobots.length === 0 || unassignedTasks.length === 0) {
+    return { assignments, nextRobotIndex: lastAssignedRobotIndex }
+  }
+  
+  // Create a copy of unassigned tasks to track assignments in this function
+  const availableTasks = [...unassignedTasks]
+  
+  // Find the starting robot index for round-robin assignment
+  let currentRobotIndex = (lastAssignedRobotIndex + 1) % idleRobots.length
+  let assignmentsThisRound = 0
+  
+  // Continue assigning until no more tasks or we've cycled through all robots
+  while (availableTasks.length > 0 && assignmentsThisRound < idleRobots.length) {
+    const robot = idleRobots[currentRobotIndex]
+    
+    // Find the nearest task to this robot
+    let nearestTask: Task | null = null
+    let shortestDistance = Infinity
+    let bestPath: Position[] = []
+    
+    for (const task of availableTasks) {
+      const distance = calculateManhattanDistance(robot.position, task.position)
+      
+      // Only consider this task if it's closer than current best
+      if (distance < shortestDistance) {
+        // Calculate path to this task (exclude this robot and task from obstacles)
+        const pathObstacles = getObstaclePositions(robots, tasks, robot.id, task.id)
+        const path = findPath(robot.position, task.position, gridSize, pathObstacles)
+        
+        // If a valid path exists, this could be our best option
+        if (path.length > 0) {
+          nearestTask = task
+          shortestDistance = distance
+          bestPath = path
+        }
+      }
+    }
+    
+    // If we found a valid assignment, add it and remove task from available list
+    if (nearestTask && bestPath.length > 0) {
+      assignments.push({
+        robotId: robot.id,
+        taskId: nearestTask.id,
+        path: bestPath
+      })
+      
+      // Remove assigned task from available tasks
+      const taskIndex = availableTasks.findIndex(t => t.id === nearestTask!.id)
+      if (taskIndex !== -1) {
+        availableTasks.splice(taskIndex, 1)
+      }
+      
+      // Update the last assigned robot index
+      lastAssignedRobotIndex = currentRobotIndex
+    }
+    
+    // Move to next robot in round-robin fashion
+    currentRobotIndex = (currentRobotIndex + 1) % idleRobots.length
+    assignmentsThisRound++
+  }
+  
+  return { assignments, nextRobotIndex: lastAssignedRobotIndex }
 } 
