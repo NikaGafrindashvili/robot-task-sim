@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useSimulationStore } from '@/store/simulationStore'
-import { assignTasksNearestFirst, getObstaclePositions } from '@/lib/assignmentStrategies'
+import { assignTasksNearestFirst, assignTasksRoundRobin, getObstaclePositions } from '@/lib/assignmentStrategies'
 
 export function useSimulationRunner() {
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
@@ -12,9 +12,11 @@ export function useSimulationRunner() {
     tasks,
     strategy,
     gridSize,
+    lastAssignedRobotIndex,
     moveRobot,
     assignTaskToRobot,
-    completeTask
+    completeTask,
+    setLastAssignedRobotIndex
   } = useSimulationStore()
 
   
@@ -30,7 +32,7 @@ export function useSimulationRunner() {
   
   const tick = () => {
     const currentState = useSimulationStore.getState()
-    const { robots, tasks, strategy, gridSize } = currentState
+    const { robots, tasks, strategy, gridSize, lastAssignedRobotIndex } = currentState
 
     // Step 1: Assign tasks to idle robots
     if (strategy === 'nearest') {
@@ -46,6 +48,23 @@ export function useSimulationRunner() {
         assignments.forEach(assignment => {
           assignTaskToRobot(assignment.robotId, assignment.taskId, assignment.path)
         })
+      }
+    } else if (strategy === 'round-robin') {
+      // Filter idle robots and unassigned tasks
+      const idleRobots = robots.filter(robot => !robot.targetTaskId)
+      const unassignedTasks = tasks.filter(task => !task.assigned)
+      
+      // Only run assignment if there are idle robots and unassigned tasks
+      if (idleRobots.length > 0 && unassignedTasks.length > 0) {
+        const result = assignTasksRoundRobin(robots, tasks, gridSize, lastAssignedRobotIndex)
+        
+        // Apply each assignment
+        result.assignments.forEach(assignment => {
+          assignTaskToRobot(assignment.robotId, assignment.taskId, assignment.path)
+        })
+        
+        // Update the last assigned robot index
+        setLastAssignedRobotIndex(result.nextRobotIndex)
       }
     }
 
