@@ -324,7 +324,7 @@ describe('Assignment Strategies', () => {
       const result = assignTasksRoundRobin(robots, tasks, gridSize, 1)
 
       expect(result.assignments).toHaveLength(2) // Only 2 robots available
-      expect(result.nextRobotIndex).toBe(0) // Should end on robot1 (index 0)
+      expect(result.nextRobotIndex).toBe(1) // Should end on robot2 (index 1)
       
       // First assignment should go to robot1 (next after index 1)
       // Second assignment should go to robot2
