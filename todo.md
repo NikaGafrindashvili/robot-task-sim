@@ -132,14 +132,14 @@
 ## Phase 6: Task Completion and Simulation End Condition
 
 ### 6.1 Task Completion & Simulation End (Prompt 12)
--   [ ] `simulationStore`: Add `completeTask(robotId, taskId)` action (removes task, resets robot).
--   [ ] (Conceptual) Unit test `completeTask` store action.
--   [ ] `useSimulationRunner`: Add task completion logic.
-    -   [ ] After robot movement, check if robot reached `targetTask` position.
-    -   [ ] If so, call `completeTask` action.
--   [ ] `useSimulationRunner`: Add simulation end condition logic.
-    -   [ ] If `isRunning`, `tasks.length === 0`, and `!dynamicTaskSpawning`, call `setIsRunning(false)`.
--   [ ] (Manual Test) Verify task completion and simulation auto-stop.
+-   [x] `simulationStore`: Add `completeTask(robotId, taskId)` action (removes task, resets robot).
+-   [x] (Conceptual) Unit test `completeTask` store action.
+-   [x] `useSimulationRunner`: Add task completion logic.
+    -   [x] After robot movement, check if robot reached `targetTask` position.
+    -   [x] If so, call `completeTask` action.
+-   [x] `useSimulationRunner`: Add simulation end condition logic.
+    -   [x] If `isRunning`, `tasks.length === 0`, and `!dynamicTaskSpawning`, call `setIsRunning(false)`.
+-   [x] (Manual Test) Verify task completion and simulation auto-stop.
 
 ## Phase 7: Dynamic Features & Visual Enhancements
 
