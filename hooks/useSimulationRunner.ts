@@ -13,10 +13,12 @@ export function useSimulationRunner() {
     strategy,
     gridSize,
     lastAssignedRobotIndex,
+    dynamicTaskSpawning,
     moveRobot,
     assignTaskToRobot,
     completeTask,
-    setLastAssignedRobotIndex
+    setLastAssignedRobotIndex,
+    pauseSimulation
   } = useSimulationStore()
 
   
@@ -32,7 +34,7 @@ export function useSimulationRunner() {
   
   const tick = () => {
     const currentState = useSimulationStore.getState()
-    const { robots, tasks, strategy, gridSize, lastAssignedRobotIndex } = currentState
+    const { robots, tasks, strategy, gridSize, lastAssignedRobotIndex, dynamicTaskSpawning, isRunning } = currentState
 
     // Step 1: Assign tasks to idle robots
     if (strategy === 'nearest') {
@@ -82,6 +84,12 @@ export function useSimulationRunner() {
         }
       }
     })
+
+    // Step 4: Check simulation end condition
+    const finalState = useSimulationStore.getState()
+    if (finalState.isRunning && finalState.tasks.length === 0 && !finalState.dynamicTaskSpawning) {
+      pauseSimulation()
+    }
   }
 
   
