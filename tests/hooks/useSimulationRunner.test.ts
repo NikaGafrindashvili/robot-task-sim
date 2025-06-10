@@ -261,4 +261,88 @@ describe('useSimulationRunner', () => {
     const updatedRobot = useSimulationStore.getState().robots[0]
     expect(updatedRobot.position).toEqual([0, 1])
   })
+
+  it('should auto-stop simulation when all tasks completed and dynamic spawning disabled', () => {
+    const store = useSimulationStore.getState()
+    
+    // Ensure dynamic task spawning is disabled
+    if (store.dynamicTaskSpawning) {
+      store.toggleDynamicTaskSpawning()
+    }
+    
+    // Add robot and task
+    store.addRobot([0, 0])
+    store.addTask([0, 2])
+    
+    const robot = useSimulationStore.getState().robots[0]
+    const task = useSimulationStore.getState().tasks[0]
+    
+    // Assign task to robot with a path that reaches the target
+    store.assignTaskToRobot(robot.id, task.id, [[0, 1], [0, 2]])
+    
+    renderHook(() => useSimulationRunner())
+    
+    // Start simulation
+    act(() => {
+      store.startSimulation()
+    })
+    
+    expect(useSimulationStore.getState().isRunning).toBe(true)
+    
+    // Let robot move to complete its path (2 ticks to reach target)
+    act(() => {
+      jest.advanceTimersByTime(500) // Move to [0, 1]
+    })
+    
+    act(() => {
+      jest.advanceTimersByTime(500) // Move to [0, 2] and complete task
+    })
+    
+    // Simulation should have auto-stopped since all tasks are complete
+    const finalState = useSimulationStore.getState()
+    expect(finalState.isRunning).toBe(false)
+    expect(finalState.tasks).toHaveLength(0) // Task should be removed
+  })
+
+  it('should NOT auto-stop simulation when dynamic spawning is enabled', () => {
+    const store = useSimulationStore.getState()
+    
+    // Ensure dynamic task spawning is enabled
+    if (!store.dynamicTaskSpawning) {
+      store.toggleDynamicTaskSpawning()
+    }
+    
+    // Add robot and task
+    store.addRobot([0, 0])
+    store.addTask([0, 2])
+    
+    const robot = useSimulationStore.getState().robots[0]
+    const task = useSimulationStore.getState().tasks[0]
+    
+    // Assign task to robot with a path that reaches the target
+    store.assignTaskToRobot(robot.id, task.id, [[0, 1], [0, 2]])
+    
+    renderHook(() => useSimulationRunner())
+    
+    // Start simulation
+    act(() => {
+      store.startSimulation()
+    })
+    
+    expect(useSimulationStore.getState().isRunning).toBe(true)
+    
+    // Let robot move to complete its path
+    act(() => {
+      jest.advanceTimersByTime(500) // Move to [0, 1]
+    })
+    
+    act(() => {
+      jest.advanceTimersByTime(500) // Move to [0, 2] and complete task
+    })
+    
+    // Simulation should still be running since dynamic spawning is enabled
+    const finalState = useSimulationStore.getState()
+    expect(finalState.isRunning).toBe(true)
+    expect(finalState.tasks).toHaveLength(0) // Task should be removed but sim continues
+  })
 }) 
