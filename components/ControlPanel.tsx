@@ -23,8 +23,8 @@ export default function ControlPanel() {
   } = useSimulationStore()
 
   return (
-    <div className="flex flex-col gap-4 p-4 w-60 border-r border-gray-200">
-      <h2 className="text-lg font-semibold">Controls</h2>
+    <div className="flex flex-col gap-4 p-6 w-72 border-r border-gray-200 bg-white">
+      <h2 className="text-xl font-semibold text-gray-800">Controls</h2>
 
       <div className="flex gap-2">
         <Button onClick={isRunning ? pauseSimulation : startSimulation}>
