@@ -345,4 +345,138 @@ describe('useSimulationRunner', () => {
     expect(finalState.isRunning).toBe(true)
     expect(finalState.tasks).toHaveLength(0) // Task should be removed but sim continues
   })
+
+  it('should spawn tasks dynamically when enabled', () => {
+    const store = useSimulationStore.getState()
+    
+    // Ensure dynamic task spawning is enabled
+    if (!store.dynamicTaskSpawning) {
+      store.toggleDynamicTaskSpawning()
+    }
+    
+    // Start with smaller grid for more predictable spawning
+    store.setGridSize([5, 5])
+    
+    // Clear any existing tasks
+    store.clearGrid()
+    
+    renderHook(() => useSimulationRunner())
+    
+    // Start simulation
+    act(() => {
+      store.startSimulation()
+    })
+    
+    const initialTaskCount = useSimulationStore.getState().tasks.length
+    expect(initialTaskCount).toBe(0)
+    
+    // Mock Math.random to ensure spawning happens (10% chance)
+    const originalRandom = Math.random
+    let randomCallCount = 0
+    Math.random = jest.fn(() => {
+      randomCallCount++
+      // Return 0.05 (less than 0.1) on first call to trigger spawning
+      if (randomCallCount === 1) return 0.05
+      // Return values for random position generation
+      if (randomCallCount === 2) return 0.2 // row = 1 (0.2 * 5 = 1)
+      if (randomCallCount === 3) return 0.4 // col = 2 (0.4 * 5 = 2)
+      return 0.5
+    })
+    
+    // Advance time by one tick
+    act(() => {
+      jest.advanceTimersByTime(500)
+    })
+    
+    // Should have spawned a task
+    const finalState = useSimulationStore.getState()
+    expect(finalState.tasks.length).toBeGreaterThan(initialTaskCount)
+    
+    // Restore original Math.random
+    Math.random = originalRandom
+  })
+
+  it('should not spawn tasks when dynamic spawning is disabled', () => {
+    const store = useSimulationStore.getState()
+    
+    // Ensure dynamic task spawning is disabled
+    if (store.dynamicTaskSpawning) {
+      store.toggleDynamicTaskSpawning()
+    }
+    
+    // Start with smaller grid
+    store.setGridSize([5, 5])
+    store.clearGrid()
+    
+    renderHook(() => useSimulationRunner())
+    
+    // Start simulation
+    act(() => {
+      store.startSimulation()
+    })
+    
+    const initialTaskCount = useSimulationStore.getState().tasks.length
+    expect(initialTaskCount).toBe(0)
+    
+    // Mock Math.random to return 0.05 (would trigger spawning if enabled)
+    const originalRandom = Math.random
+    Math.random = jest.fn(() => 0.05)
+    
+    // Advance time by one tick
+    act(() => {
+      jest.advanceTimersByTime(500)
+    })
+    
+    // Should not have spawned any tasks
+    const finalState = useSimulationStore.getState()
+    expect(finalState.tasks.length).toBe(initialTaskCount)
+    
+    // Restore original Math.random
+    Math.random = originalRandom
+  })
+
+  it('should not spawn tasks when already at maximum (20 tasks)', () => {
+    const store = useSimulationStore.getState()
+    
+    // Ensure dynamic task spawning is enabled
+    if (!store.dynamicTaskSpawning) {
+      store.toggleDynamicTaskSpawning()
+    }
+    
+    // Set larger grid to accommodate 20 tasks
+    store.setGridSize([10, 10])
+    store.clearGrid()
+    
+    // Add 20 tasks manually to reach the limit
+    for (let i = 0; i < 20; i++) {
+      const row = Math.floor(i / 10)
+      const col = i % 10
+      store.addTask([row, col])
+    }
+    
+    expect(useSimulationStore.getState().tasks.length).toBe(20)
+    
+    renderHook(() => useSimulationRunner())
+    
+    // Start simulation
+    act(() => {
+      store.startSimulation()
+    })
+    
+    // Mock Math.random to return 0.05 (would trigger spawning if under limit)
+    const originalRandom = Math.random
+    Math.random = jest.fn(() => 0.05)
+    
+    // Advance time by one tick
+    act(() => {
+      jest.advanceTimersByTime(500)
+    })
+    
+    // Should still have exactly 20 tasks (no new spawning)
+    const finalState = useSimulationStore.getState()
+    expect(finalState.tasks.length).toBe(20)
+    
+    // Restore original Math.random
+    Math.random = originalRandom
+  })
 }) 

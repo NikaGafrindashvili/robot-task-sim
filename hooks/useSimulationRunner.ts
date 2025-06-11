@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useSimulationStore } from '@/store/simulationStore'
 import { assignTasksNearestFirst, assignTasksRoundRobin, getObstaclePositions } from '@/lib/assignmentStrategies'
+import { isCellOccupied } from '@/lib/utils'
 
 export function useSimulationRunner() {
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
@@ -18,7 +19,8 @@ export function useSimulationRunner() {
     assignTaskToRobot,
     completeTask,
     setLastAssignedRobotIndex,
-    pauseSimulation
+    pauseSimulation,
+    addTask
   } = useSimulationStore()
 
   
@@ -36,7 +38,32 @@ export function useSimulationRunner() {
     const currentState = useSimulationStore.getState()
     const { robots, tasks, strategy, gridSize, lastAssignedRobotIndex, dynamicTaskSpawning, isRunning } = currentState
 
-    // Step 1: Assign tasks to idle robots
+    // Step 1: Dynamic task spawning
+    if (dynamicTaskSpawning && tasks.length < 20) {
+      // 10% chance to spawn a task per tick
+      if (Math.random() < 0.1) {
+        // Try to find an unoccupied position (max 50 attempts)
+        let attempts = 0
+        let spawnPosition: [number, number] | null = null
+        
+        while (attempts < 50 && !spawnPosition) {
+          const randomRow = Math.floor(Math.random() * gridSize[0])
+          const randomCol = Math.floor(Math.random() * gridSize[1])
+          
+          if (!isCellOccupied(randomRow, randomCol, robots, tasks)) {
+            spawnPosition = [randomRow, randomCol] as [number, number]
+          }
+          attempts++
+        }
+        
+        // If we found a valid position, spawn the task
+        if (spawnPosition) {
+          addTask(spawnPosition)
+        }
+      }
+    }
+
+    // Step 2: Assign tasks to idle robots
     if (strategy === 'nearest') {
       // Filter idle robots and unassigned tasks
       const idleRobots = robots.filter(robot => !robot.targetTaskId)
@@ -70,7 +97,7 @@ export function useSimulationRunner() {
       }
     }
 
-    // Step 2: Move robots that have paths
+    // Step 3: Move robots that have paths
     const updatedState = useSimulationStore.getState()
     updatedState.robots.forEach(robot => {
       if (robot.path && robot.path.length > 0) {
@@ -78,14 +105,14 @@ export function useSimulationRunner() {
         const remainingPath = robot.path.slice(1)
         moveRobot(robot.id, nextPosition, remainingPath)
         
-        // Step 3: Check if robot reached its target (path is now empty)
+        // Step 4: Check if robot reached its target (path is now empty)
         if (remainingPath.length === 0 && robot.targetTaskId) {
           completeTask(robot.id, robot.targetTaskId)
         }
       }
     })
 
-    // Step 4: Check simulation end condition
+    // Step 5: Check simulation end condition
     const finalState = useSimulationStore.getState()
     if (finalState.isRunning && finalState.tasks.length === 0 && !finalState.dynamicTaskSpawning) {
       pauseSimulation()

@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { Position, Robot, Task } from "@/types"
+import { Position, Robot, Task } from "@/store/simulationStore"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
