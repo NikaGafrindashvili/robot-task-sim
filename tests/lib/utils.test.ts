@@ -1,5 +1,5 @@
 import { calculateManhattanDistance, findPath, isCellOccupied } from '../../lib/utils'
-import { Position, Robot, Task } from '../../types'
+import { Position, Robot, Task } from '../../store/simulationStore'
 
 describe('Pathfinding Utilities', () => {
   describe('calculateManhattanDistance', () => {
@@ -182,8 +182,8 @@ describe('Pathfinding Utilities', () => {
 
   describe('isCellOccupied', () => {
     const robots: Robot[] = [
-      { id: '1', position: [0, 0] },
-      { id: '2', position: [2, 3] }
+      { id: '1', position: [0, 0], targetTaskId: null, path: null },
+      { id: '2', position: [2, 3], targetTaskId: null, path: null }
     ]
 
     const tasks: Task[] = [
