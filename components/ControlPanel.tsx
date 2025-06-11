@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Play, Pause, RefreshCcw } from "lucide-react"
 import { useSimulationStore } from "@/store/simulationStore"
+import VisualLegend from "./VisualLegend"
 
 export default function ControlPanel() {
   const {
