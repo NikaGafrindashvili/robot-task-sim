@@ -312,6 +312,10 @@ describe('useSimulationRunner', () => {
       store.toggleDynamicTaskSpawning()
     }
     
+    // Mock Math.random to prevent spawning during test
+    const originalRandom = Math.random
+    Math.random = jest.fn(() => 0.5) // Return value > 0.1 to prevent spawning
+    
     // Add robot and task
     store.addRobot([0, 0])
     store.addTask([0, 2])
@@ -344,6 +348,9 @@ describe('useSimulationRunner', () => {
     const finalState = useSimulationStore.getState()
     expect(finalState.isRunning).toBe(true)
     expect(finalState.tasks).toHaveLength(0) // Task should be removed but sim continues
+    
+    // Restore original Math.random
+    Math.random = originalRandom
   })
 
   it('should spawn tasks dynamically when enabled', () => {
