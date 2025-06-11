@@ -49,7 +49,7 @@ interface SimulationState {
 }
 
 export const useSimulationStore = create<SimulationState>((set, get) => ({
-  gridSize: [30, 75],
+  gridSize: [20, 30],
   robots: [],
   tasks: [],
   tickSpeed: 2,

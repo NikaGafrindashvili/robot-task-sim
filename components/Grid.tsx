@@ -25,13 +25,22 @@ export default function Grid() {
     }
   }
 
+  // Helper function to check if a cell is part of any robot's path
+  const isInPath = (row: number, col: number) => {
+    return robots.some(robot => 
+      robot.path && robot.path.some(([pathRow, pathCol]) => 
+        pathRow === row && pathCol === col
+      )
+    )
+  }
+
   return (
-    <div className="overflow-auto">
+    <div className="inline-block">
       <div
-        className="grid"
+        className="grid border border-gray-500 rounded-lg overflow-hidden"
         style={{
-          gridTemplateRows: `repeat(${gridSize[0]}, 30px)`,
-          gridTemplateColumns: `repeat(${gridSize[1]}, 30px)`,
+          gridTemplateRows: `repeat(${gridSize[0]}, 40px)`,
+          gridTemplateColumns: `repeat(${gridSize[1]}, 40px)`,
           display: 'grid'
         }}
       >
@@ -41,11 +50,18 @@ export default function Grid() {
 
           const robot = robots.find(r => r.position[0] === row && r.position[1] === col)
           const task = tasks.find(t => t.position[0] === row && t.position[1] === col)
+          const cellIsInPath = isInPath(row, col)
 
           return (
-            <Cell key={index} row={row} col={col} onClick={handleClick}>
-              {task && <TaskIcon />}
-              {robot && <RobotIcon />}
+            <Cell 
+              key={index} 
+              row={row} 
+              col={col} 
+              onClick={handleClick}
+              isInPath={cellIsInPath}
+            >
+              {task && <TaskIcon assigned={task.assigned} />}
+              {robot && <RobotIcon hasTask={!!robot.targetTaskId} />}
             </Cell>
           )
         })}

@@ -2,6 +2,9 @@
 
 import Grid from '@/components/Grid'
 import ControlPanel from '@/components/ControlPanel'
+import Header from '@/components/Header'
+import StatusPanel from '@/components/StatusPanel'
+import Footer from '@/components/Footer'
 import { useSimulationRunner } from '@/hooks/useSimulationRunner'
 
 export default function HomePage() {
@@ -9,11 +12,22 @@ export default function HomePage() {
   useSimulationRunner()
 
   return (
-    <main className="flex h-screen w-screen overflow-hidden">
-      <ControlPanel />
-      <div className="flex-1 p-4 overflow-auto">
-        <Grid />
-      </div>
-    </main>
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Header />
+      
+      <main className="flex-1 flex overflow-hidden">
+        <ControlPanel />
+        
+        <div className="flex-1 flex items-center justify-center p-6">
+          <Grid />
+        </div>
+        
+        <div className="w-80 p-6 overflow-auto">
+          <StatusPanel />
+        </div>
+      </main>
+      
+      <Footer />
+    </div>
   )
 }

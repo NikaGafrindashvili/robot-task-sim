@@ -144,19 +144,21 @@
 ## Phase 7: Dynamic Features & Visual Enhancements
 
 ### 7.1 Dynamic Task Spawning (Prompt 13)
--   [ ] `useSimulationRunner`: Add dynamic task spawning logic.
-    -   [ ] If `dynamicTaskSpawning` is true and `tasks.length < 20`.
-    -   [ ] Chance to spawn per tick.
-    -   [ ] Generate random, unoccupied position.
-    -   [ ] Use `isCellOccupied` for check.
-    -   [ ] Call `addTask` store action.
--   [ ] (Manual Test) Verify dynamic task spawning.
+-   [x] `useSimulationRunner`: Add dynamic task spawning logic.
+    -   [x] If `dynamicTaskSpawning` is true and `tasks.length < 20`.
+    -   [x] Chance to spawn per tick.
+    -   [x] Generate random, unoccupied position.
+    -   [x] Use `isCellOccupied` for check.
+    -   [x] Call `addTask` store action.
+-   [x] (Manual Test) Verify dynamic task spawning.
 
 ### 7.2 Visual Enhancements (Prompt 14)
--   [ ] Install `lucide-react` (if not already done via Shadcn).
--   [ ] `Grid.tsx`: Replace robot/task representations with `lucide-react` icons (e.g., `<Bot />`, `<PackageCheck />`).
--   [ ] `Grid.tsx`: Implement path visualization (simplified: highlight cells in `robot.path` with a faint background color).
--   [ ] (Manual Test) Verify icons and path highlighting.
+-   [x] Install `lucide-react` (if not already done via Shadcn).
+-   [x] `Grid.tsx`: Replace robot/task representations with `lucide-react` icons (e.g., `<Bot />`, `<Target />`).
+-   [x] `Grid.tsx`: Implement path visualization (simplified: highlight cells in `robot.path` with a faint background color).
+-   [x] Enhanced icon states: Different visual states for idle vs busy robots, assigned vs unassigned tasks.
+-   [x] Added VisualLegend component to explain different visual states.
+-   [x] (Manual Test) Verify icons and path highlighting.
 
 ## Phase 8: Testing, Refinement, and Final Polish
 

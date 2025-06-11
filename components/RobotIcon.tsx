@@ -1,5 +1,17 @@
 import { Bot } from "lucide-react"
 
-export default function RobotIcon() {
-  return <Bot className="w-4 h-4 text-blue-500" />
+interface RobotIconProps {
+  hasTask?: boolean
+}
+
+export default function RobotIcon({ hasTask = false }: RobotIconProps) {
+  return (
+    <Bot 
+      className={`w-5 h-5 ${
+        hasTask 
+          ? "text-blue-600 fill-blue-100" 
+          : "text-blue-500"
+      }`} 
+    />
+  )
 }
