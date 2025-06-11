@@ -71,6 +71,8 @@ export default function ControlPanel() {
         <Button variant="outline" onClick={clearGrid}>Clear</Button>
         <Button variant="outline" onClick={randomizeLayout}>Randomize</Button>
       </div>
+
+      <VisualLegend />
     </div>
   )
 }
