@@ -1,5 +1,17 @@
 import { Target } from "lucide-react"
 
-export default function TaskIcon() {
-  return <Target className="w-4 h-4 text-red-500" />
+interface TaskIconProps {
+  assigned?: boolean
+}
+
+export default function TaskIcon({ assigned = false }: TaskIconProps) {
+  return (
+    <Target 
+      className={`w-4 h-4 ${
+        assigned 
+          ? "text-orange-600 fill-orange-100" 
+          : "text-red-500"
+      }`} 
+    />
+  )
 }
