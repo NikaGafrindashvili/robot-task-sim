@@ -7,7 +7,7 @@ interface TaskIconProps {
 export default function TaskIcon({ assigned = false }: TaskIconProps) {
   return (
     <Target 
-      className={`w-4 h-4 ${
+      className={`w-5 h-5 ${
         assigned 
           ? "text-orange-600 fill-orange-100" 
           : "text-red-500"

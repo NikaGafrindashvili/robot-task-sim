@@ -16,9 +16,9 @@ export default function Cell({
   return (
     <div
       onClick={() => onClick?.(row, col)}
-      className={`w-7 h-7 border border-gray-200 flex items-center justify-center cursor-pointer ${
+      className={`w-10 h-10 border border-gray-400 flex items-center justify-center cursor-pointer ${
         isInPath 
-          ? "bg-blue-50 border-blue-200" 
+          ? "bg-blue-50 border-blue-300" 
           : "hover:bg-gray-50"
       }`}
     >

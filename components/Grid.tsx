@@ -35,12 +35,12 @@ export default function Grid() {
   }
 
   return (
-    <div className="overflow-auto">
+    <div className="inline-block">
       <div
-        className="grid"
+        className="grid border border-gray-500 rounded-lg overflow-hidden"
         style={{
-          gridTemplateRows: `repeat(${gridSize[0]}, 30px)`,
-          gridTemplateColumns: `repeat(${gridSize[1]}, 30px)`,
+          gridTemplateRows: `repeat(${gridSize[0]}, 40px)`,
+          gridTemplateColumns: `repeat(${gridSize[1]}, 40px)`,
           display: 'grid'
         }}
       >
