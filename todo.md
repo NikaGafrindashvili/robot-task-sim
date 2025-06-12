@@ -167,11 +167,11 @@
 -   [x] Ensure `ControlPanel` remains fixed during grid scroll.
 -   [x] `Grid.tsx`: Add user feedback for attempting to place on an occupied cell (console warning or simple visual cue).
 -   [x] `ControlPanel.tsx`: Add user feedback for attempting to start simulation without robots/tasks (console warning or simple visual cue).
--   [X] Perform a general UI review: styling, spacing, usability.
--   [X] (Manual Test) Verify grid scrolling and refined feedback messages.
+-   [x] Perform a general UI review: styling, spacing, usability.
+-   [x] (Manual Test) Verify grid scrolling and refined feedback messages.
 
 ### 8.2 Comprehensive Testing & QA
--   [ ] Write component tests for critical UI components (Control Panel interactions, Grid rendering based on state variations).
+-   [x] Write component tests for critical UI components (Control Panel interactions, Grid rendering based on state variations).
 -   [ ] (If feasible) Write more integrated simulation tests (e.g., via React Testing Library, simulate ticks and verify state changes over time).
 -   [ ] Perform thorough Manual QA:
     -   [ ] Test all user interactions in `ControlPanel`.
