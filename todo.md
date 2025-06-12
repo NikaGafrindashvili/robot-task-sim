@@ -163,12 +163,12 @@
 ## Phase 8: Testing, Refinement, and Final Polish
 
 ### 8.1 Grid Scrolling & UI Polish (Prompt 15)
--   [ ] `src/app/page.tsx`: Ensure `Grid` container is scrollable (`overflow: auto`).
--   [ ] Ensure `ControlPanel` remains fixed during grid scroll.
--   [ ] `Grid.tsx`: Add user feedback for attempting to place on an occupied cell (console warning or simple visual cue).
--   [ ] `ControlPanel.tsx`: Add user feedback for attempting to start simulation without robots/tasks (console warning or simple visual cue).
--   [ ] Perform a general UI review: styling, spacing, usability.
--   [ ] (Manual Test) Verify grid scrolling and refined feedback messages.
+-   [x] `src/app/page.tsx`: Ensure `Grid` container is scrollable (`overflow: auto`).
+-   [x] Ensure `ControlPanel` remains fixed during grid scroll.
+-   [x] `Grid.tsx`: Add user feedback for attempting to place on an occupied cell (console warning or simple visual cue).
+-   [x] `ControlPanel.tsx`: Add user feedback for attempting to start simulation without robots/tasks (console warning or simple visual cue).
+-   [X] Perform a general UI review: styling, spacing, usability.
+-   [X] (Manual Test) Verify grid scrolling and refined feedback messages.
 
 ### 8.2 Comprehensive Testing & QA
 -   [ ] Write component tests for critical UI components (Control Panel interactions, Grid rendering based on state variations).
