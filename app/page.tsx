@@ -19,7 +19,9 @@ export default function HomePage() {
         <ControlPanel />
         
         <div className="flex-1 flex items-center justify-center p-6">
-          <Grid />
+          <div className="w-full h-full max-h-[70vh] overflow-auto flex items-center justify-center">
+            <Grid />
+          </div>
         </div>
         
         <div className="w-80 p-6 overflow-auto">
