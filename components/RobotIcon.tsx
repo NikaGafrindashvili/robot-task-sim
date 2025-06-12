@@ -7,6 +7,7 @@ interface RobotIconProps {
 export default function RobotIcon({ hasTask = false }: RobotIconProps) {
   return (
     <Bot 
+      data-testid="robot-icon"
       className={`w-5 h-5 ${
         hasTask 
           ? "text-blue-600 fill-blue-100" 
