@@ -36,8 +36,7 @@ export function useSimulationRunner() {
 
   
   const tick = () => {
-    const currentState = useSimulationStore.getState()
-    const { robots, tasks, strategy, gridSize, lastAssignedRobotIndex, dynamicTaskSpawning, isRunning } = currentState
+    const { robots, tasks, obstacles, strategy, gridSize, lastAssignedRobotIndex, dynamicTaskSpawning } = useSimulationStore.getState()
 
     // Step 1: Dynamic task spawning
     if (dynamicTaskSpawning && tasks.length < 20) {
