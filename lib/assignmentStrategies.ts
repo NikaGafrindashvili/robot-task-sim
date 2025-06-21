@@ -1,4 +1,4 @@
-import { Position, Robot, Task } from '@/store/simulationStore'
+import { Position, Robot, Task, Obstacle } from '@/store/simulationStore'
 import { calculateManhattanDistance, findPath } from './utils'
 
 /**
@@ -23,7 +23,8 @@ export interface TaskAssignment {
 export function assignTasksNearestFirst(
   robots: Robot[],
   tasks: Task[],
-  gridSize: Position
+  gridSize: Position,
+  obstacles: Obstacle[] = []
 ): TaskAssignment[] {
   const assignments: TaskAssignment[] = []
   
@@ -54,7 +55,7 @@ export function assignTasksNearestFirst(
       // Only consider this task if it's closer than current best
       if (distance < shortestDistance) {
         // Calculate path to this task (exclude this robot and task from obstacles)
-        const pathObstacles = getObstaclePositions(robots, tasks, robot.id, task.id)
+        const pathObstacles = getObstaclePositions(robots, tasks, obstacles, robot.id, task.id)
         const path = findPath(robot.position, task.position, gridSize, pathObstacles)
         
         // If a valid path exists, this could be our best option
@@ -91,6 +92,7 @@ export function assignTasksNearestFirst(
  * 
  * @param robots Array of all robots
  * @param tasks Array of all tasks
+ * @param obstacles Array of obstacle positions
  * @param excludeRobotId Optional robot ID to exclude from obstacles
  * @param excludeTaskId Optional task ID to exclude from obstacles
  * @returns Array of obstacle positions
@@ -98,26 +100,32 @@ export function assignTasksNearestFirst(
 export function getObstaclePositions(
   robots: Robot[],
   tasks: Task[],
+  obstacles: Obstacle[],
   excludeRobotId?: string,
   excludeTaskId?: string
 ): Position[] {
-  const obstacles: Position[] = []
+  const obstaclePositions: Position[] = []
   
   // Add robot positions as obstacles (except the moving robot)
   robots.forEach(robot => {
     if (robot.id !== excludeRobotId) {
-      obstacles.push(robot.position)
+      obstaclePositions.push(robot.position)
     }
   })
   
   // Add task positions as obstacles (except the target task)
   tasks.forEach(task => {
     if (task.id !== excludeTaskId) {
-      obstacles.push(task.position)
+      obstaclePositions.push(task.position)
     }
   })
   
-  return obstacles
+  // Add obstacle positions
+  obstacles.forEach(obstacle => {
+    obstaclePositions.push(obstacle.position)
+  })
+  
+  return obstaclePositions
 }
 
 /**
@@ -128,13 +136,15 @@ export function getObstaclePositions(
  * @param tasks Array of tasks
  * @param gridSize Grid dimensions [rows, cols]
  * @param lastAssignedRobotIndex Index of the last robot that was assigned a task
+ * @param obstacles Array of obstacle positions
  * @returns Object containing assignments array and updated lastAssignedRobotIndex
  */
 export function assignTasksRoundRobin(
   robots: Robot[],
   tasks: Task[],
   gridSize: Position,
-  lastAssignedRobotIndex: number
+  lastAssignedRobotIndex: number,
+  obstacles: Obstacle[] = []
 ): { assignments: TaskAssignment[], nextRobotIndex: number } {
   const assignments: TaskAssignment[] = []
   
@@ -169,7 +179,7 @@ export function assignTasksRoundRobin(
       // Only consider this task if it's closer than current best
       if (distance < shortestDistance) {
         // Calculate path to this task (exclude this robot and task from obstacles)
-        const pathObstacles = getObstaclePositions(robots, tasks, robot.id, task.id)
+        const pathObstacles = getObstaclePositions(robots, tasks, obstacles, robot.id, task.id)
         const path = findPath(robot.position, task.position, gridSize, pathObstacles)
         
         // If a valid path exists, this could be our best option

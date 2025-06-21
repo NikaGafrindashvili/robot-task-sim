@@ -11,6 +11,7 @@ export function useSimulationRunner() {
     tickSpeed, 
     robots, 
     tasks,
+    obstacles,
     strategy,
     gridSize,
     lastAssignedRobotIndex,
@@ -50,7 +51,11 @@ export function useSimulationRunner() {
           const randomRow = Math.floor(Math.random() * gridSize[0])
           const randomCol = Math.floor(Math.random() * gridSize[1])
           
-          if (!isCellOccupied(randomRow, randomCol, robots, tasks)) {
+          // Check if position is occupied by robots, tasks, or obstacles
+          const isOccupied = isCellOccupied(randomRow, randomCol, robots, tasks) ||
+                            obstacles.some(obs => obs.position[0] === randomRow && obs.position[1] === randomCol)
+          
+          if (!isOccupied) {
             spawnPosition = [randomRow, randomCol] as [number, number]
           }
           attempts++
@@ -71,7 +76,7 @@ export function useSimulationRunner() {
       
       // Only run assignment if there are idle robots and unassigned tasks
       if (idleRobots.length > 0 && unassignedTasks.length > 0) {
-        const assignments = assignTasksNearestFirst(robots, tasks, gridSize)
+        const assignments = assignTasksNearestFirst(robots, tasks, gridSize, obstacles)
         
         // Apply each assignment
         assignments.forEach(assignment => {
@@ -85,7 +90,7 @@ export function useSimulationRunner() {
       
       // Only run assignment if there are idle robots and unassigned tasks
       if (idleRobots.length > 0 && unassignedTasks.length > 0) {
-        const result = assignTasksRoundRobin(robots, tasks, gridSize, lastAssignedRobotIndex)
+        const result = assignTasksRoundRobin(robots, tasks, gridSize, lastAssignedRobotIndex, obstacles)
         
         // Apply each assignment
         result.assignments.forEach(assignment => {
