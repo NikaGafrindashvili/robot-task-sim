@@ -2,8 +2,9 @@
 
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
-import { Play, Pause, RefreshCcw } from "lucide-react"
+import { Play, Pause, RefreshCcw, Bot, Target, Mountain } from "lucide-react"
 import { useSimulationStore } from "@/store/simulationStore"
+import type { PlacementMode } from "@/store/simulationStore"
 import VisualLegend from "./VisualLegend"
 import { useState, useEffect } from "react"
 
@@ -23,6 +24,8 @@ export default function ControlPanel() {
     randomizeLayout,
     robots,
     tasks,
+    placementMode,
+    setPlacementMode,
   } = useSimulationStore()
 
   const [showWarning, setShowWarning] = useState(false)
@@ -96,6 +99,45 @@ export default function ControlPanel() {
       <div className="flex gap-2 mt-4">
         <Button variant="outline" onClick={clearGrid}>Clear</Button>
         <Button variant="outline" onClick={randomizeLayout}>Randomize</Button>
+      </div>
+
+      <div>
+        <label className="block font-medium mb-2">Placement Mode</label>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setPlacementMode('robot')}
+            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              placementMode === 'robot'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            <Bot className="w-4 h-4 mr-1 inline" />
+            Robot
+          </button>
+          <button
+            onClick={() => setPlacementMode('task')}
+            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              placementMode === 'task'
+                ? 'bg-red-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            <Target className="w-4 h-4 mr-1 inline" />
+            Task
+          </button>
+          <button
+            onClick={() => setPlacementMode('obstacle')}
+            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              placementMode === 'obstacle'
+                ? 'bg-gray-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            <Mountain className="w-4 h-4 mr-1 inline" />
+            Obstacle
+          </button>
+        </div>
       </div>
 
       <VisualLegend />

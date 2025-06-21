@@ -24,6 +24,8 @@ export type Robot = {
 
 export type Strategy = 'nearest' | 'round-robin'
 
+export type PlacementMode = 'robot' | 'task' | 'obstacle'
+
 interface SimulationState {
   gridSize: [number, number]
   robots: Robot[]
@@ -34,6 +36,7 @@ interface SimulationState {
   isRunning: boolean
   dynamicTaskSpawning: boolean
   lastAssignedRobotIndex: number
+  placementMode: PlacementMode
 
   // Actions
   setGridSize: (size: [number, number]) => void
@@ -46,6 +49,7 @@ interface SimulationState {
   setStrategy: (s: Strategy) => void
   setTickSpeed: (speed: 1 | 2 | 5) => void
   toggleDynamicTaskSpawning: () => void
+  setPlacementMode: (mode: PlacementMode) => void
   startSimulation: () => void
   pauseSimulation: () => void
   resetSimulation: () => void
@@ -56,7 +60,7 @@ interface SimulationState {
 }
 
 export const useSimulationStore = create<SimulationState>((set, get) => ({
-  gridSize: [20, 30],
+  gridSize: [15, 25],
   robots: [],
   tasks: [],
   obstacles: [],
@@ -65,6 +69,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   isRunning: false,
   dynamicTaskSpawning: false,
   lastAssignedRobotIndex: -1,
+  placementMode: 'robot',
 
   setGridSize: (size) => set({ gridSize: size }),
 
@@ -244,6 +249,8 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
     
     set({ robots: updatedRobots, tasks: updatedTasks })
   },
+
+  setPlacementMode: (mode) => set({ placementMode: mode }),
 }))
 
 // Utility function

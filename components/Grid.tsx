@@ -7,7 +7,7 @@ import TaskIcon from './TaskIcon'
 import ObstacleIcon from './ObstacleIcon'
 
 export default function Grid() {
-  const { gridSize, robots, tasks, obstacles, addRobot, addTask, addObstacle, removeAtPosition, isRunning } = useSimulationStore()
+  const { gridSize, robots, tasks, obstacles, addRobot, addTask, addObstacle, removeAtPosition, isRunning, placementMode } = useSimulationStore()
 
   const handleClick = (row: number, col: number) => {
     if (isRunning) return
@@ -19,12 +19,11 @@ export default function Grid() {
     if (occupiedRobot || occupiedTask || occupiedObstacle) {
       removeAtPosition([row, col])
     } else {
-      const totalItems = robots.length + tasks.length + obstacles.length
-      if (totalItems % 3 === 0) {
+      if (placementMode === 'robot') {
         addRobot([row, col])
-      } else if (totalItems % 3 === 1) {
+      } else if (placementMode === 'task') {
         addTask([row, col])
-      } else {
+      } else if (placementMode === 'obstacle') {
         addObstacle([row, col])
       }
     }
