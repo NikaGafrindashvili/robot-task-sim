@@ -10,6 +10,11 @@ export type Task = {
   assigned: boolean
 }
 
+export type Obstacle = {
+  id: string
+  position: Position
+}
+
 export type Robot = {
   id: string
   position: Position
@@ -23,6 +28,7 @@ interface SimulationState {
   gridSize: [number, number]
   robots: Robot[]
   tasks: Task[]
+  obstacles: Obstacle[]
   tickSpeed: 1 | 2 | 5
   strategy: Strategy
   isRunning: boolean
@@ -33,6 +39,7 @@ interface SimulationState {
   setGridSize: (size: [number, number]) => void
   addRobot: (pos: Position) => void
   addTask: (pos: Position) => void
+  addObstacle: (pos: Position) => void
   removeAtPosition: (pos: Position) => void
   clearGrid: () => void
   randomizeLayout: () => void
@@ -52,6 +59,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   gridSize: [20, 30],
   robots: [],
   tasks: [],
+  obstacles: [],
   tickSpeed: 2,
   strategy: 'nearest',
   isRunning: false,
@@ -61,8 +69,10 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   setGridSize: (size) => set({ gridSize: size }),
 
   addRobot: (position) => {
-    const { robots, tasks } = get()
-    const occupied = robots.some(r => isSame(r.position, position)) || tasks.some(t => isSame(t.position, position))
+    const { robots, tasks, obstacles } = get()
+    const occupied = robots.some(r => isSame(r.position, position)) || 
+                     tasks.some(t => isSame(t.position, position)) ||
+                     obstacles.some(o => isSame(o.position, position))
     if (occupied) return
 
     const newRobot: Robot = {
@@ -75,9 +85,11 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   },
 
   addTask: (position) => {
-    const { tasks, robots } = get()
+    const { tasks, robots, obstacles } = get()
     if (tasks.length >= 20) return
-    const occupied = tasks.some(t => isSame(t.position, position)) || robots.some(r => isSame(r.position, position))
+    const occupied = tasks.some(t => isSame(t.position, position)) || 
+                     robots.some(r => isSame(r.position, position)) ||
+                     obstacles.some(o => isSame(o.position, position))
     if (occupied) return
 
     const newTask: Task = {
@@ -88,15 +100,30 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
     set({ tasks: [...tasks, newTask] })
   },
 
+  addObstacle: (position) => {
+    const { obstacles, robots, tasks } = get()
+    const occupied = obstacles.some(o => isSame(o.position, position)) ||
+                     robots.some(r => isSame(r.position, position)) ||
+                     tasks.some(t => isSame(t.position, position))
+    if (occupied) return
+
+    const newObstacle: Obstacle = {
+      id: uuidv4(),
+      position,
+    }
+    set({ obstacles: [...obstacles, newObstacle] })
+  },
+
   removeAtPosition: (position) => {
-    const { tasks, robots } = get()
+    const { tasks, robots, obstacles } = get()
     set({
       tasks: tasks.filter(t => !isSame(t.position, position)),
       robots: robots.filter(r => !isSame(r.position, position)),
+      obstacles: obstacles.filter(o => !isSame(o.position, position)),
     })
   },
 
-  clearGrid: () => set({ robots: [], tasks: [] }),
+  clearGrid: () => set({ robots: [], tasks: [], obstacles: [] }),
 
   randomizeLayout: () => {
     const [rows, cols] = get().gridSize
