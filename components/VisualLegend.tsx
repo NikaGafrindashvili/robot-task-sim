@@ -1,4 +1,5 @@
 import { Bot, Target } from "lucide-react"
+import { Mountain } from "lucide-react"
 
 export default function VisualLegend() {
   return (
@@ -26,6 +27,12 @@ export default function VisualLegend() {
         <div className="flex items-center gap-2">
           <Target className="w-5 h-5 text-orange-600 fill-orange-100" />
           <span>Assigned Task</span>
+        </div>
+        
+        {/* Obstacle */}
+        <div className="flex items-center gap-2">
+          <Mountain className="w-5 h-5 text-gray-600 fill-gray-400" />
+          <span>Obstacle</span>
         </div>
         
         {/* Path visualization */}

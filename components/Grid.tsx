@@ -4,23 +4,27 @@ import { useSimulationStore } from '@/store/simulationStore'
 import Cell from './Cell'
 import RobotIcon from './RobotIcon'
 import TaskIcon from './TaskIcon'
+import ObstacleIcon from './ObstacleIcon'
 
 export default function Grid() {
-  const { gridSize, robots, tasks, addRobot, addTask, removeAtPosition, isRunning } = useSimulationStore()
+  const { gridSize, robots, tasks, obstacles, addRobot, addTask, addObstacle, removeAtPosition, isRunning, placementMode } = useSimulationStore()
 
   const handleClick = (row: number, col: number) => {
     if (isRunning) return
 
     const occupiedRobot = robots.find(r => r.position[0] === row && r.position[1] === col)
     const occupiedTask = tasks.find(t => t.position[0] === row && t.position[1] === col)
+    const occupiedObstacle = obstacles.find(o => o.position[0] === row && o.position[1] === col)
 
-    if (occupiedRobot || occupiedTask) {
+    if (occupiedRobot || occupiedTask || occupiedObstacle) {
       removeAtPosition([row, col])
     } else {
-      if (robots.length <= tasks.length) {
+      if (placementMode === 'robot') {
         addRobot([row, col])
-      } else {
+      } else if (placementMode === 'task') {
         addTask([row, col])
+      } else if (placementMode === 'obstacle') {
+        addObstacle([row, col])
       }
     }
   }
@@ -50,6 +54,7 @@ export default function Grid() {
 
           const robot = robots.find(r => r.position[0] === row && r.position[1] === col)
           const task = tasks.find(t => t.position[0] === row && t.position[1] === col)
+          const obstacle = obstacles.find(o => o.position[0] === row && o.position[1] === col)
           const cellIsInPath = isInPath(row, col)
 
           return (
@@ -62,6 +67,7 @@ export default function Grid() {
             >
               {task && <TaskIcon assigned={task.assigned} />}
               {robot && <RobotIcon hasTask={!!robot.targetTaskId} />}
+              {obstacle && <ObstacleIcon />}
             </Cell>
           )
         })}

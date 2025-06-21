@@ -1,5 +1,5 @@
 import { assignTasksNearestFirst, assignTasksRoundRobin, getObstaclePositions } from '../../lib/assignmentStrategies'
-import { Position, Robot, Task } from '../../store/simulationStore'
+import { Position, Robot, Task, Obstacle } from '../../store/simulationStore'
 
 describe('Assignment Strategies', () => {
   const gridSize: Position = [10, 10]
@@ -172,21 +172,62 @@ describe('Assignment Strategies', () => {
       expect(assignedRobotIds).toContain('robot1')
       expect(assignedRobotIds).toContain('robot2')
     })
+
+    it('should find a path around an obstacle', () => {
+      const robots: Robot[] = [
+        { id: 'robot1', position: [0, 0], targetTaskId: null, path: null },
+      ]
+      const tasks: Task[] = [
+        { id: 'task1', position: [0, 2], assigned: false },
+      ]
+      const obstacles: Obstacle[] = [
+        { id: 'obs1', position: [0, 1] },
+      ]
+
+      const assignments = assignTasksNearestFirst(robots, tasks, gridSize, obstacles)
+      
+      expect(assignments).toHaveLength(1)
+      expect(assignments[0].path.length).toBeGreaterThan(2) // Path should be longer than direct path
+      expect(assignments[0].path).not.toContainEqual([0, 1]) // Path should not go through obstacle
+    })
+
+    it('should not assign a task if it is unreachable', () => {
+      const robots: Robot[] = [
+        { id: 'robot1', position: [0, 0], targetTaskId: null, path: null },
+      ]
+      const tasks: Task[] = [
+        { id: 'task1', position: [0, 2], assigned: false },
+      ]
+      const obstacles: Obstacle[] = [
+        { id: 'obs1', position: [0, 1] }, // Wall right of start
+        { id: 'obs2', position: [1, 0] }, // Wall below start
+        { id: 'obs3', position: [1, 1] }, // Wall diagonal to start, completing the box
+      ]
+
+      const assignments = assignTasksNearestFirst(
+        robots,
+        tasks,
+        gridSize,
+        obstacles
+      )
+
+      expect(assignments).toHaveLength(0) // No path available
+    })
   })
 
   describe('getObstaclePositions', () => {
     it('should return all robot and task positions', () => {
       const robots: Robot[] = [
         { id: 'robot1', position: [0, 0], targetTaskId: null, path: null },
-        { id: 'robot2', position: [5, 5], targetTaskId: null, path: null }
+        { id: 'robot2', position: [5, 5], targetTaskId: null, path: null },
       ]
 
       const tasks: Task[] = [
         { id: 'task1', position: [2, 2], assigned: false },
-        { id: 'task2', position: [7, 7], assigned: false }
+        { id: 'task2', position: [7, 7], assigned: false },
       ]
 
-      const obstacles = getObstaclePositions(robots, tasks)
+      const obstacles = getObstaclePositions(robots, tasks, [])
 
       expect(obstacles).toHaveLength(4)
       expect(obstacles).toContainEqual([0, 0])
@@ -205,7 +246,7 @@ describe('Assignment Strategies', () => {
         { id: 'task1', position: [2, 2], assigned: false }
       ]
 
-      const obstacles = getObstaclePositions(robots, tasks, 'robot1')
+      const obstacles = getObstaclePositions(robots, tasks, [], 'robot1')
 
       expect(obstacles).toHaveLength(2)
       expect(obstacles).not.toContainEqual([0, 0]) // robot1 excluded
@@ -223,7 +264,7 @@ describe('Assignment Strategies', () => {
         { id: 'task2', position: [7, 7], assigned: false }
       ]
 
-      const obstacles = getObstaclePositions(robots, tasks, undefined, 'task1')
+      const obstacles = getObstaclePositions(robots, tasks, [], undefined, 'task1')
 
       expect(obstacles).toHaveLength(2)
       expect(obstacles).toContainEqual([0, 0])     // robot1 included
@@ -242,7 +283,13 @@ describe('Assignment Strategies', () => {
         { id: 'task2', position: [7, 7], assigned: false }
       ]
 
-      const obstacles = getObstaclePositions(robots, tasks, 'robot1', 'task1')
+      const obstacles = getObstaclePositions(
+        robots,
+        tasks,
+        [],
+        'robot1',
+        'task1'
+      )
 
       expect(obstacles).toHaveLength(2)
       expect(obstacles).not.toContainEqual([0, 0]) // robot1 excluded
@@ -250,40 +297,31 @@ describe('Assignment Strategies', () => {
       expect(obstacles).not.toContainEqual([2, 2]) // task1 excluded
       expect(obstacles).toContainEqual([7, 7])     // task2 included
     })
-  })
-  describe('assignTasksRoundRobin', () => {
-    it('should assign tasks in round-robin order', () => {
+
+    it('should return all robot and task positions with obstacles', () => {
       const robots: Robot[] = [
         { id: 'robot1', position: [0, 0], targetTaskId: null, path: null },
-        { id: 'robot2', position: [1, 1], targetTaskId: null, path: null },
-        { id: 'robot3', position: [2, 2], targetTaskId: null, path: null }
+        { id: 'robot2', position: [5, 5], targetTaskId: null, path: null },
       ]
 
       const tasks: Task[] = [
-        { id: 'task1', position: [0, 2], assigned: false },
-        { id: 'task2', position: [1, 3], assigned: false },
-        { id: 'task3', position: [2, 4], assigned: false }
+        { id: 'task1', position: [2, 2], assigned: false },
+        { id: 'task2', position: [7, 7], assigned: false },
       ]
+      const obstacles: Obstacle[] = [{ id: 'obs1', position: [9, 9] }]
 
-      // Start with lastAssignedRobotIndex = -1, so first robot (index 0) should be first
-      const result = assignTasksRoundRobin(robots, tasks, gridSize, -1)
+      const obstaclePositions = getObstaclePositions(
+        robots,
+        tasks,
+        obstacles
+      )
 
-      expect(result.assignments).toHaveLength(3)
-      expect(result.nextRobotIndex).toBe(2) // Last robot assigned was at index 2
-
-      // Verify assignments exist and have valid paths
-      result.assignments.forEach(assignment => {
-        expect(assignment.robotId).toBeDefined()
-        expect(assignment.taskId).toBeDefined()
-        expect(assignment.path.length).toBeGreaterThan(0)
-      })
-
-      // Each robot should get a unique task
-      const robotIds = result.assignments.map(a => a.robotId)
-      const taskIds = result.assignments.map(a => a.taskId)
-      
-      expect(new Set(robotIds).size).toBe(3)
-      expect(new Set(taskIds).size).toBe(3)
+      expect(obstaclePositions).toHaveLength(5)
+      expect(obstaclePositions).toContainEqual([0, 0])
+      expect(obstaclePositions).toContainEqual([5, 5])
+      expect(obstaclePositions).toContainEqual([2, 2])
+      expect(obstaclePositions).toContainEqual([7, 7])
+      expect(obstaclePositions).toContainEqual([9, 9])
     })
 
     it('should start from correct robot index based on lastAssignedRobotIndex', () => {
@@ -474,6 +512,33 @@ describe('Assignment Strategies', () => {
       // Robot2 should get the remaining task
       const robot2Assignment = result.assignments.find(a => a.robotId === 'robot2')
       expect(robot2Assignment?.taskId).toBe('task2')
+    })
+  })
+
+  describe('assignTasksRoundRobin', () => {
+    it('should assign tasks in round-robin order', () => {
+      const robots: Robot[] = [
+        { id: 'robot1', position: [0, 0], targetTaskId: null, path: null },
+        { id: 'robot2', position: [1, 1], targetTaskId: null, path: null },
+        { id: 'robot3', position: [2, 2], targetTaskId: null, path: null },
+      ]
+
+      const tasks: Task[] = [
+        { id: 'task1', position: [0, 2], assigned: false },
+        { id: 'task2', position: [1, 3], assigned: false },
+        { id: 'task3', position: [2, 4], assigned: false },
+      ]
+
+      const result = assignTasksRoundRobin(robots, tasks, gridSize, -1)
+
+      expect(result.assignments).toHaveLength(3)
+      expect(result.nextRobotIndex).toBe(2)
+
+      const robotIds = result.assignments.map(a => a.robotId)
+      const taskIds = result.assignments.map(a => a.taskId)
+
+      expect(new Set(robotIds).size).toBe(3)
+      expect(new Set(taskIds).size).toBe(3)
     })
   })
 }) 
