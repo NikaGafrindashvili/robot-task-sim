@@ -65,10 +65,45 @@ function isInBounds(position: Position, gridSize: Position): boolean {
  * @param obstacles Array of obstacle positions
  * @returns true if position is occupied
  */
-function isObstacle(position: Position, obstacles: Position[]): boolean {
-  return obstacles.some(([obsRow, obsCol]) => 
-    position[0] === obsRow && position[1] === obsCol
-  )
+function isObstacle(
+  position: Position,
+  obstacles: Position[],
+  gridSize: Position
+): boolean {
+  return obstacles.some(([obsRow, obsCol]) => {
+    const isSamePosition = position[0] === obsRow && position[1] === obsCol
+    return isSamePosition && isInBounds([obsRow, obsCol], gridSize)
+  })
+}
+
+function getNeighbors(
+  pos: Position,
+  gridSize: Position,
+  obstacles: Position[]
+): Position[] {
+  const [row, col] = pos
+  const neighbors: Position[] = []
+  const directions: Position[] = [
+    [-1, 0],
+    [1, 0],
+    [0, -1],
+    [0, 1],
+  ]
+
+  for (const [dRow, dCol] of directions) {
+    const newRow = row + dRow
+    const newCol = col + dCol
+    const newPos: Position = [newRow, newCol]
+
+    if (
+      isInBounds(newPos, gridSize) &&
+      !isObstacle(newPos, obstacles, gridSize)
+    ) {
+      neighbors.push(newPos)
+    }
+  }
+
+  return neighbors
 }
 
 /**
@@ -80,79 +115,41 @@ function isObstacle(position: Position, obstacles: Position[]): boolean {
  * @returns Array of positions representing the path, or empty array if no path found
  */
 export function findPath(
-  startPos: Position, 
-  endPos: Position, 
-  gridSize: Position, 
+  startPos: Position,
+  endPos: Position,
+  gridSize: Position,
   obstacles: Position[] = []
 ): Position[] {
-  // If start and end are the same, no movement needed
-  if (startPos[0] === endPos[0] && startPos[1] === endPos[1]) {
+  if (
+    !isInBounds(startPos, gridSize) ||
+    !isInBounds(endPos, gridSize) ||
+    isObstacle(startPos, obstacles, gridSize) ||
+    isObstacle(endPos, obstacles, gridSize)
+  ) {
     return []
   }
 
-  // Check if positions are within grid bounds
-  if (!isInBounds(startPos, gridSize) || !isInBounds(endPos, gridSize)) {
-    return []
-  }
-
-  // Check if start or end positions are blocked by obstacles
-  if (isObstacle(startPos, obstacles) || isObstacle(endPos, obstacles)) {
-    return []
-  }
-
-  
-  const queue: Array<{ position: Position; path: Position[] }> = [
-    { position: startPos, path: [] }
+  const queue: Array<{ pos: Position; path: Position[] }> = [
+    { pos: startPos, path: [] },
   ]
-  const visited = new Set<string>()
-  
-  
-  const directions: Position[] = [
-    [-1, 0], [0, 1], [1, 0], [0, -1]
-  ]
+  const visited = new Set<string>([`${startPos[0]},${startPos[1]}`])
 
   while (queue.length > 0) {
-    const current = queue.shift()!
-    const { position, path } = current
-    const [row, col] = position
+    const { pos, path } = queue.shift()!
 
-    
-    const posKey = `${row},${col}`
-    
-    
-    if (visited.has(posKey)) {
-      continue
-    }
-    
-    visited.add(posKey)
-
-    
-    if (row === endPos[0] && col === endPos[1]) {
+    if (pos[0] === endPos[0] && pos[1] === endPos[1]) {
       return path
     }
 
-   
-    for (const [dRow, dCol] of directions) {
-      const newRow = row + dRow
-      const newCol = col + dCol
-      const newPos: Position = [newRow, newCol]
-      const newPosKey = `${newRow},${newCol}`
-
-            if (
-        !isInBounds(newPos, gridSize) ||
-        visited.has(newPosKey) ||
-        isObstacle(newPos, obstacles)
-      ) {
-        continue
+    const neighbors = getNeighbors(pos, gridSize, obstacles)
+    for (const neighbor of neighbors) {
+      const neighborKey = `${neighbor[0]},${neighbor[1]}`
+      if (!visited.has(neighborKey)) {
+        visited.add(neighborKey)
+        queue.push({ pos: neighbor, path: [...path, neighbor] })
       }
-
-      queue.push({
-        position: newPos,
-        path: [...path, newPos]
-      })
     }
   }
 
-  
   return []
 }

@@ -29,6 +29,16 @@ describe('Grid', () => {
     expect(useSimulationStore.getState().robots.length + useSimulationStore.getState().tasks.length).toBe(1)
   })
 
+  it('adds an obstacle when in obstacle placement mode', () => {
+    useSimulationStore.getState().setGridSize([2, 2])
+    useSimulationStore.getState().setPlacementMode('obstacle')
+    render(<Grid />)
+    const cell = screen.getByTestId('cell-0-0')
+    fireEvent.click(cell)
+    expect(useSimulationStore.getState().obstacles).toHaveLength(1)
+    expect(screen.getByTestId('obstacle-icon')).toBeInTheDocument()
+  })
+
   it('removes robot or task when clicking an occupied cell', () => {
     useSimulationStore.getState().addRobot([0, 0])
     render(<Grid />)
