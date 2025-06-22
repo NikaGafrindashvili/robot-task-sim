@@ -34,6 +34,21 @@ export default function ControlPanel() {
   const [rows, setRows] = useState(gridSize[0])
   const [cols, setCols] = useState(gridSize[1])
 
+  const handleInputChange =
+    (setter: (value: number) => void) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const sanitized = e.target.value.replace(/[^0-9]/g, '')
+      setter(sanitized === '' ? 0 : parseInt(sanitized, 10))
+    }
+
+  const handleInputBlur =
+    (value: number, setter: (value: number) => void) => () => {
+      if (value < 5) {
+        setter(5)
+      } else if (value > 100) {
+        setter(100)
+      }
+    }
+
   useEffect(() => {
     if (robots.length > 0 && tasks.length > 0) {
       setShowWarning(false)
@@ -113,12 +128,12 @@ export default function ControlPanel() {
             </label>
             <input
               id="rows-input"
-              type="number"
-              value={rows}
-              onChange={(e) => setRows(Number(e.target.value))}
+              type="text"
+              inputMode="numeric"
+              value={rows === 0 ? '' : rows}
+              onChange={handleInputChange(setRows)}
+              onBlur={handleInputBlur(rows, setRows)}
               className="w-20 h-9 border border-gray-300 rounded text-center bg-gray-50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
-              min="5"
-              max="100"
               disabled={isRunning}
             />
           </div>
@@ -128,12 +143,12 @@ export default function ControlPanel() {
             </label>
             <input
               id="cols-input"
-              type="number"
-              value={cols}
-              onChange={(e) => setCols(Number(e.target.value))}
+              type="text"
+              inputMode="numeric"
+              value={cols === 0 ? '' : cols}
+              onChange={handleInputChange(setCols)}
+              onBlur={handleInputBlur(cols, setCols)}
               className="w-20 h-9 border border-gray-300 rounded text-center bg-gray-50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
-              min="5"
-              max="100"
               disabled={isRunning}
             />
           </div>
