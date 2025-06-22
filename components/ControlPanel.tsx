@@ -105,28 +105,33 @@ export default function ControlPanel() {
       </div>
 
       <div>
-        <label className="block font-medium mb-1">Grid Size</label>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1">
-            <span className="text-sm text-gray-600">Rows:</span>
+        <label className="block font-medium mb-2">Grid Size</label>
+        <div className="flex items-end gap-2">
+          <div>
+            <label htmlFor="rows-input" className="block text-sm font-medium text-gray-700 mb-1">
+              Rows
+            </label>
             <input
+              id="rows-input"
               type="number"
               value={rows}
               onChange={(e) => setRows(Number(e.target.value))}
-              className="w-12 h-8 border border-gray-300 rounded text-center bg-gray-50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-20 h-9 border border-gray-300 rounded text-center bg-gray-50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
               min="5"
               max="100"
               disabled={isRunning}
             />
           </div>
-          <span className="text-gray-400">×</span>
-          <div className="flex items-center gap-1">
-            <span className="text-sm text-gray-600">Cols:</span>
+          <div>
+            <label htmlFor="cols-input" className="block text-sm font-medium text-gray-700 mb-1">
+              Cols
+            </label>
             <input
+              id="cols-input"
               type="number"
               value={cols}
               onChange={(e) => setCols(Number(e.target.value))}
-              className="w-12 h-8 border border-gray-300 rounded text-center bg-gray-50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-20 h-9 border border-gray-300 rounded text-center bg-gray-50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
               min="5"
               max="100"
               disabled={isRunning}
@@ -136,7 +141,7 @@ export default function ControlPanel() {
             variant="secondary"
             onClick={handleGridSizeChange}
             disabled={isRunning}
-            className="ml-2"
+            className="h-9"
           >
             Update
           </Button>
