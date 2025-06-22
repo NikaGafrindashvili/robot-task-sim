@@ -107,29 +107,36 @@ export default function ControlPanel() {
       <div>
         <label className="block font-medium mb-1">Grid Size</label>
         <div className="flex items-center gap-2">
-          <input
-            type="number"
-            value={rows}
-            onChange={(e) => setRows(Number(e.target.value))}
-            className="w-16 border rounded px-2 py-1"
-            min="5"
-            max="100"
-            disabled={isRunning}
-          />
-          <span>x</span>
-          <input
-            type="number"
-            value={cols}
-            onChange={(e) => setCols(Number(e.target.value))}
-            className="w-16 border rounded px-2 py-1"
-            min="5"
-            max="100"
-            disabled={isRunning}
-          />
+          <div className="flex items-center gap-1">
+            <span className="text-sm text-gray-600">Rows:</span>
+            <input
+              type="number"
+              value={rows}
+              onChange={(e) => setRows(Number(e.target.value))}
+              className="w-12 h-8 border border-gray-300 rounded text-center bg-gray-50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              min="5"
+              max="100"
+              disabled={isRunning}
+            />
+          </div>
+          <span className="text-gray-400">×</span>
+          <div className="flex items-center gap-1">
+            <span className="text-sm text-gray-600">Cols:</span>
+            <input
+              type="number"
+              value={cols}
+              onChange={(e) => setCols(Number(e.target.value))}
+              className="w-12 h-8 border border-gray-300 rounded text-center bg-gray-50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              min="5"
+              max="100"
+              disabled={isRunning}
+            />
+          </div>
           <Button
             variant="secondary"
             onClick={handleGridSizeChange}
             disabled={isRunning}
+            className="ml-2"
           >
             Update
           </Button>
