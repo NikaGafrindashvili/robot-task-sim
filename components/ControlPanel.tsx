@@ -26,9 +26,13 @@ export default function ControlPanel() {
     tasks,
     placementMode,
     setPlacementMode,
+    gridSize,
+    setGridSize,
   } = useSimulationStore()
 
   const [showWarning, setShowWarning] = useState(false)
+  const [rows, setRows] = useState(gridSize[0])
+  const [cols, setCols] = useState(gridSize[1])
 
   useEffect(() => {
     if (robots.length > 0 && tasks.length > 0) {
@@ -44,6 +48,15 @@ export default function ControlPanel() {
     }
     startSimulation()
   }
+
+  const handleGridSizeChange = () => {
+    setGridSize([rows, cols])
+  }
+
+  useEffect(() => {
+    setRows(gridSize[0])
+    setCols(gridSize[1])
+  }, [gridSize])
 
   return (
     <div className="flex flex-col gap-4 p-6 w-72 border-r border-gray-200 bg-white">
@@ -89,6 +102,38 @@ export default function ControlPanel() {
           <option value="nearest">Nearest First</option>
           <option value="round-robin">Round Robin</option>
         </select>
+      </div>
+
+      <div>
+        <label className="block font-medium mb-1">Grid Size</label>
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            value={rows}
+            onChange={(e) => setRows(Number(e.target.value))}
+            className="w-16 border rounded px-2 py-1"
+            min="5"
+            max="100"
+            disabled={isRunning}
+          />
+          <span>x</span>
+          <input
+            type="number"
+            value={cols}
+            onChange={(e) => setCols(Number(e.target.value))}
+            className="w-16 border rounded px-2 py-1"
+            min="5"
+            max="100"
+            disabled={isRunning}
+          />
+          <Button
+            variant="secondary"
+            onClick={handleGridSizeChange}
+            disabled={isRunning}
+          >
+            Update
+          </Button>
+        </div>
       </div>
 
       <div className="flex items-center gap-2">
