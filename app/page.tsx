@@ -21,8 +21,8 @@ export default function HomePage() {
           <ControlPanel />
         </div>
         
-        <div className="flex-1 flex flex-col justify-center items-center p-6">
-          <div className="w-full h-full max-h-[70vh] overflow-auto flex justify-center mt-8">
+        <div className="flex-1 flex flex-col justify-center items-center px-6 py-3">
+          <div className="w-full max-h-[70vh] overflow-auto flex justify-center mt-4">
             <Grid />
           </div>
           <SimulationGridControls />
