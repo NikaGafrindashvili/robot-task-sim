@@ -6,6 +6,7 @@ import Header from '@/components/Header'
 import StatusPanel from '@/components/StatusPanel'
 import Footer from '@/components/Footer'
 import { useSimulationRunner } from '@/hooks/useSimulationRunner'
+import SimulationGridControls from '@/components/SimulationGridControls'
 
 export default function HomePage() {
 
@@ -20,8 +21,11 @@ export default function HomePage() {
           <ControlPanel />
         </div>
         
-        <div className="flex-1 flex justify-center items-center p-6">
-          <Grid />
+        <div className="flex-1 flex flex-col justify-center items-center p-6">
+          <div className="w-full h-full max-h-[70vh] overflow-auto flex justify-center mt-8">
+            <Grid />
+          </div>
+          <SimulationGridControls />
         </div>
         
         <div className="w-80 p-6 overflow-auto">

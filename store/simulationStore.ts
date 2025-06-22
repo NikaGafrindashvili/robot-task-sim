@@ -37,6 +37,7 @@ interface SimulationState {
   dynamicTaskSpawning: boolean
   lastAssignedRobotIndex: number
   placementMode: PlacementMode
+  hasStarted: boolean
 
   // Actions
   setGridSize: (size: [number, number]) => void
@@ -70,6 +71,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   dynamicTaskSpawning: false,
   lastAssignedRobotIndex: -1,
   placementMode: 'robot',
+  hasStarted: false,
 
   setGridSize: (size) => set({ gridSize: size }),
 
@@ -171,7 +173,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   setTickSpeed: (speed) => set({ tickSpeed: speed }),
   toggleDynamicTaskSpawning: () => set({ dynamicTaskSpawning: !get().dynamicTaskSpawning }),
 
-  startSimulation: () => set({ isRunning: true }),
+  startSimulation: () => set({ isRunning: true, hasStarted: true }),
   pauseSimulation: () => set({ isRunning: false }),
   resetSimulation: () => {
     const { gridSize } = get()
@@ -184,6 +186,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
       dynamicTaskSpawning: false,
       gridSize,
       lastAssignedRobotIndex: -1,
+      hasStarted: false,
     })
   },
 
