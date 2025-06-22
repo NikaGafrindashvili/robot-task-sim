@@ -183,6 +183,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
       strategy: 'nearest',
       robots: [],
       tasks: [],
+      obstacles: [],
       dynamicTaskSpawning: false,
       gridSize,
       lastAssignedRobotIndex: -1,
