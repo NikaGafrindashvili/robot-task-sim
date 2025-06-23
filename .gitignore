@@ -42,3 +42,5 @@ next-env.d.ts
 
 #LocalData
 sampleData.jsonl
+# clerk configuration (can include secrets)
+/.clerk/

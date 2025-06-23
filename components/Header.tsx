@@ -1,5 +1,6 @@
 import { useSimulationStore } from '@/store/simulationStore'
 import { Bot, Target, Timer, Zap } from 'lucide-react'
+import { AuthButtons } from './AuthButtons'
 
 export default function Header() {
   const { robots, tasks, isRunning, tickSpeed } = useSimulationStore()
@@ -49,6 +50,9 @@ export default function Header() {
               </span>
             </div>
           </div>
+
+          {/* Auth Buttons */}
+          <AuthButtons />
         </div>
       </div>
     </header>
