@@ -3,6 +3,40 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ConvexClientProvider } from "./ConvexClientProvider";
 import { ClerkProvider } from "@clerk/nextjs";
+import Header from "@/components/Header";
+
+// Suppress Convex auth errors in local dev (console, error overlay, and unhandledrejection)
+if (typeof window !== "undefined" && process.env.NODE_ENV === "development") {
+  const originalError = console.error;
+  console.error = function (...args) {
+    if (
+      typeof args[0] === "string" &&
+      args[0].includes("Failed to authenticate")
+    ) {
+      return;
+    }
+    originalError.apply(console, args);
+  };
+
+  window.addEventListener("error", (event) => {
+    if (
+      typeof event.message === "string" &&
+      event.message.includes("Failed to authenticate")
+    ) {
+      event.preventDefault();
+    }
+  });
+
+  window.addEventListener("unhandledrejection", (event) => {
+    if (
+      event.reason &&
+      typeof event.reason.message === "string" &&
+      event.reason.message.includes("Failed to authenticate")
+    ) {
+      event.preventDefault();
+    }
+  });
+}
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +64,10 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-         <ConvexClientProvider>{children}</ConvexClientProvider>
+          <ConvexClientProvider>
+            <Header />
+            {children}
+          </ConvexClientProvider>
         </body>
       </html>
     </ClerkProvider>
