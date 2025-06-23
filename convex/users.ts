@@ -28,7 +28,6 @@ export const createUser = mutation({
       name: args.name,
       email: args.email,
       clerkId: args.clerkId,
-      role: "user",
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });

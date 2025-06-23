@@ -22,11 +22,6 @@ export function AuthButtons() {
         <div className="text-sm font-medium text-gray-900">
           {user?.firstName || user?.emailAddresses[0]?.emailAddress}
         </div>
-        {userProfile && (
-          <div className="text-xs text-gray-500 capitalize">
-            {userProfile.role} user
-          </div>
-        )}
       </div>
       <SignOutButton>
         <Button variant="outline" size="sm">Sign Out</Button>
