@@ -1,6 +1,10 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
+function isProduction() {
+  return process.env.NODE_ENV === "production";
+}
+
 export const createUser = mutation({
   args: {
     name: v.string(),
@@ -9,7 +13,7 @@ export const createUser = mutation({
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
+    if (!identity && isProduction()) {
       throw new Error("Not authenticated");
     }
 
@@ -40,7 +44,7 @@ export const getUser = query({
   args: { clerkId: v.string() },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
+    if (!identity && isProduction()) {
       throw new Error("Not authenticated");
     }
 
@@ -55,13 +59,13 @@ export const getCurrentUser = query({
   args: {},
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
+    if (!identity && isProduction()) {
       return null;
     }
 
     return await ctx.db
       .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity ? identity.subject : ""))
       .first();
   },
 }); 
