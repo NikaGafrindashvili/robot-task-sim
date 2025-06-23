@@ -1,5 +1,7 @@
 import { useSimulationStore } from '@/store/simulationStore'
 import { Bot, Target, Timer, Zap } from 'lucide-react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { AuthButtons } from './AuthButtons'
 
 export default function Header() {
@@ -9,9 +11,29 @@ export default function Header() {
   const busyRobots = robots.filter(robot => robot.targetTaskId).length
   const availableTasks = tasks.filter(task => !task.assigned).length
   const assignedTasks = tasks.filter(task => task.assigned).length
+  const pathname = usePathname()
 
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4">
+      {/* Navbar */}
+      <nav className="mb-2 flex gap-4">
+        <Link
+          href="/"
+          className={`text-sm font-medium px-2 py-1 rounded transition-colors ${
+            pathname === '/' ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-200'
+          }`}
+        >
+          Home
+        </Link>
+        <Link
+          href="/challanges"
+          className={`text-sm font-medium px-2 py-1 rounded transition-colors ${
+            pathname.startsWith('/challanges') ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-200'
+          }`}
+        >
+          Challanges
+        </Link>
+      </nav>
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Robot Task Simulator</h1>
