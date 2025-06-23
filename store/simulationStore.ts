@@ -26,6 +26,17 @@ export type Strategy = 'nearest' | 'round-robin'
 
 export type PlacementMode = 'robot' | 'task' | 'obstacle'
 
+export type ChallengeMap = {
+  id: string
+  name: string
+  description: string
+  gridSize: [number, number]
+  robots?: Position[]
+  tasks: Position[]
+  obstacles: Position[]
+  difficulty: 'Easy' | 'Medium' | 'Hard'
+}
+
 interface SimulationState {
   gridSize: [number, number]
   robots: Robot[]
@@ -47,6 +58,7 @@ interface SimulationState {
   removeAtPosition: (pos: Position) => void
   clearGrid: () => void
   randomizeLayout: () => void
+  loadChallengeMap: (challengeMap: ChallengeMap) => void
   setStrategy: (s: Strategy) => void
   setTickSpeed: (speed: 1 | 2 | 5) => void
   toggleDynamicTaskSpawning: () => void
@@ -167,6 +179,42 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
     }
 
     set({ tasks, robots })
+  },
+
+  loadChallengeMap: (challengeMap) => {
+    // Reset simulation first
+    set({
+      isRunning: false,
+      hasStarted: false,
+      gridSize: challengeMap.gridSize,
+      robots: [],
+      tasks: [],
+      obstacles: [],
+      lastAssignedRobotIndex: -1,
+    })
+
+    // Create robots from positions (if provided)
+    const robots: Robot[] = (challengeMap.robots || []).map(position => ({
+      id: uuidv4(),
+      position,
+      targetTaskId: null,
+      path: null,
+    }))
+
+    // Create tasks from positions
+    const tasks: Task[] = challengeMap.tasks.map(position => ({
+      id: uuidv4(),
+      position,
+      assigned: false,
+    }))
+
+    // Create obstacles from positions
+    const obstacles: Obstacle[] = challengeMap.obstacles.map(position => ({
+      id: uuidv4(),
+      position,
+    }))
+
+    set({ robots, tasks, obstacles })
   },
 
   setStrategy: (strategy) => set({ strategy }),
