@@ -11,10 +11,13 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.32.0",
+    "@clerk/nextjs": "^6.22.0",
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-switch": "^1.2.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "convex": "^1.24.8",
     "lucide-react": "^0.511.0",
     "next": "15.3.3",
     "react": "^19.0.0",
