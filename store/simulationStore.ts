@@ -139,7 +139,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
       position,
       assigned: false,
     }
-    set({ tasks: [...tasks, newTask] })
+    set({ tasks: [...tasks, newTask], challengeModeEnabled: false })
   },
 
   addObstacle: (position) => {
@@ -159,11 +159,12 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   removeAtPosition: (position) => {
     const { tasks, robots, obstacles, challengeModeEnabled } = get()
     const isObstacle = obstacles.some(o => isSame(o.position, position))
+    const isTask = tasks.some(t => isSame(t.position, position))
     set({
       tasks: tasks.filter(t => !isSame(t.position, position)),
       robots: robots.filter(r => !isSame(r.position, position)),
       obstacles: obstacles.filter(o => !isSame(o.position, position)),
-      ...(isObstacle && challengeModeEnabled ? { challengeModeEnabled: false } : {}),
+      ...((isObstacle && challengeModeEnabled) || isTask ? { challengeModeEnabled: false } : {}),
     })
   },
 
