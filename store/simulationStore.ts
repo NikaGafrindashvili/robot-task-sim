@@ -51,6 +51,7 @@ interface SimulationState {
   placementMode: PlacementMode
   hasStarted: boolean
   maxRobots: number
+  challengeModeEnabled: boolean
 
   // Actions
   setGridSize: (size: [number, number]) => void
@@ -73,6 +74,7 @@ interface SimulationState {
   completeTask: (robotId: string, taskId: string) => void
   setLastAssignedRobotIndex: (index: number) => void
   setMaxRobots: (max: number) => void
+  setChallengeModeEnabled: (enabled: boolean) => void
 }
 
 export const useSimulationStore = create<SimulationState>((set, get) => ({
@@ -88,6 +90,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   placementMode: 'robot',
   hasStarted: false,
   maxRobots: 10,
+  challengeModeEnabled: false,
 
   setGridSize: (size) => set({ gridSize: size }),
 
@@ -145,15 +148,17 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   },
 
   removeAtPosition: (position) => {
-    const { tasks, robots, obstacles } = get()
+    const { tasks, robots, obstacles, challengeModeEnabled } = get()
+    const isObstacle = obstacles.some(o => isSame(o.position, position))
     set({
       tasks: tasks.filter(t => !isSame(t.position, position)),
       robots: robots.filter(r => !isSame(r.position, position)),
       obstacles: obstacles.filter(o => !isSame(o.position, position)),
+      ...(isObstacle && challengeModeEnabled ? { challengeModeEnabled: false } : {}),
     })
   },
 
-  clearGrid: () => set({ robots: [], tasks: [], obstacles: [] }),
+  clearGrid: () => set({ robots: [], tasks: [], obstacles: [], challengeModeEnabled: false }),
 
   randomizeLayout: () => {
     const [rows, cols] = get().gridSize
@@ -203,6 +208,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
       obstacles: [],
       lastAssignedRobotIndex: -1,
       maxRobots: challengeMap.maxRobots,
+      challengeModeEnabled: true,
     })
 
     // Create robots from positions (if provided)
@@ -248,6 +254,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
       gridSize,
       lastAssignedRobotIndex: -1,
       hasStarted: false,
+      challengeModeEnabled: false,
     })
   },
 
@@ -317,6 +324,8 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   setPlacementMode: (mode) => set({ placementMode: mode }),
 
   setMaxRobots: (max) => set({ maxRobots: max }),
+
+  setChallengeModeEnabled: (enabled) => set({ challengeModeEnabled: enabled }),
 }))
 
 // Utility function

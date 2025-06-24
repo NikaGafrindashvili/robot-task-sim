@@ -30,6 +30,8 @@ export default function ControlPanel() {
     setGridSize,
     maxRobots,
     setMaxRobots,
+    challengeModeEnabled,
+    setChallengeModeEnabled,
   } = useSimulationStore()
 
   const [showWarning, setShowWarning] = useState(false)
@@ -79,6 +81,7 @@ export default function ControlPanel() {
 
   const handleMaxRobotsUpdate = () => {
     setMaxRobots(maxRobotsInput)
+    setChallengeModeEnabled(false)
   }
 
   const handleStart = () => {
@@ -92,6 +95,7 @@ export default function ControlPanel() {
 
   const handleGridSizeChange = () => {
     setGridSize([rows, cols])
+    setChallengeModeEnabled(false)
   }
 
   useEffect(() => {
@@ -234,6 +238,11 @@ export default function ControlPanel() {
       <div className="flex items-center gap-2">
         <Switch checked={dynamicTaskSpawning} onCheckedChange={toggleDynamicTaskSpawning} />
         <span>Auto Tasks</span>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <Switch checked={challengeModeEnabled} disabled />
+        <span>Challenge Mode Enabled</span>
       </div>
 
       <div className="flex gap-2 mt-4">
