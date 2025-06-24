@@ -250,11 +250,13 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
     set({ isRunning: true, hasStarted: true, simulationStartTime: Date.now(), simulationEndTime: null, score: null })
   },
   pauseSimulation: () => {
-    const { simulationStartTime, simulationEndTime, isRunning } = get()
+    const { simulationStartTime, simulationEndTime, isRunning, maxRobots, robots } = get()
     if (isRunning && simulationStartTime && !simulationEndTime) {
       const end = Date.now()
       const duration = (end - simulationStartTime) / 1000
-      const score = Math.max(0, 1000 - Math.round(duration * 10))
+      const baseScore = Math.max(0, 1000 - Math.round(duration * 10))
+      const bonus = (maxRobots - robots.length) * 100
+      const score = baseScore + bonus
       set({ isRunning: false, simulationEndTime: end, score })
     } else {
       set({ isRunning: false })
@@ -323,7 +325,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   },
 
   completeTask: (robotId, taskId) => {
-    const { robots, tasks, simulationStartTime, isRunning } = get()
+    const { robots, tasks, simulationStartTime, isRunning, maxRobots } = get()
     
     // Remove the completed task
     const updatedTasks = tasks.filter(task => task.id !== taskId)
@@ -344,7 +346,9 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
     if (updatedTasks.length === 0 && isRunning && simulationStartTime) {
       const end = Date.now()
       const duration = (end - simulationStartTime) / 1000
-      const score = Math.max(0, 1000 - Math.round(duration * 10))
+      const baseScore = Math.max(0, 1000 - Math.round(duration * 10))
+      const bonus = (maxRobots - robots.length) * 100
+      const score = baseScore + bonus
       set({ isRunning: false, simulationEndTime: end, score })
     }
     set({ robots: updatedRobots, tasks: updatedTasks })

@@ -7,11 +7,18 @@ import Footer from '@/components/Footer'
 import { useSimulationRunner } from '@/hooks/useSimulationRunner'
 import SimulationGridControls from '@/components/SimulationGridControls'
 import { useSimulationStore } from '@/store/simulationStore'
+import { useEffect } from 'react'
 
 export default function HomePage() {
 
   useSimulationRunner()
-  const { score, isRunning } = useSimulationStore()
+  const { score, isRunning, resetSimulation } = useSimulationStore()
+
+  useEffect(() => {
+    return () => {
+      resetSimulation()
+    }
+  }, [resetSimulation])
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
