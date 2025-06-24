@@ -52,6 +52,9 @@ interface SimulationState {
   hasStarted: boolean
   maxRobots: number
   challengeModeEnabled: boolean
+  simulationStartTime: number | null
+  simulationEndTime: number | null
+  score: number | null
 
   // Actions
   setGridSize: (size: [number, number]) => void
@@ -75,6 +78,7 @@ interface SimulationState {
   setLastAssignedRobotIndex: (index: number) => void
   setMaxRobots: (max: number) => void
   setChallengeModeEnabled: (enabled: boolean) => void
+  getScore: () => number | null
 }
 
 export const useSimulationStore = create<SimulationState>((set, get) => ({
@@ -91,6 +95,9 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   hasStarted: false,
   maxRobots: 10,
   challengeModeEnabled: false,
+  simulationStartTime: null,
+  simulationEndTime: null,
+  score: null,
 
   setGridSize: (size) => set({ gridSize: size }),
 
@@ -239,8 +246,20 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   setTickSpeed: (speed) => set({ tickSpeed: speed }),
   toggleDynamicTaskSpawning: () => set({ dynamicTaskSpawning: !get().dynamicTaskSpawning }),
 
-  startSimulation: () => set({ isRunning: true, hasStarted: true }),
-  pauseSimulation: () => set({ isRunning: false }),
+  startSimulation: () => {
+    set({ isRunning: true, hasStarted: true, simulationStartTime: Date.now(), simulationEndTime: null, score: null })
+  },
+  pauseSimulation: () => {
+    const { simulationStartTime, simulationEndTime, isRunning } = get()
+    if (isRunning && simulationStartTime && !simulationEndTime) {
+      const end = Date.now()
+      const duration = (end - simulationStartTime) / 1000
+      const score = Math.max(0, 1000 - Math.round(duration * 10))
+      set({ isRunning: false, simulationEndTime: end, score })
+    } else {
+      set({ isRunning: false })
+    }
+  },
   resetSimulation: () => {
     const { gridSize } = get()
     set({
@@ -255,6 +274,9 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
       lastAssignedRobotIndex: -1,
       hasStarted: false,
       challengeModeEnabled: false,
+      simulationStartTime: null,
+      simulationEndTime: null,
+      score: null,
     })
   },
 
@@ -301,7 +323,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   },
 
   completeTask: (robotId, taskId) => {
-    const { robots, tasks } = get()
+    const { robots, tasks, simulationStartTime, isRunning } = get()
     
     // Remove the completed task
     const updatedTasks = tasks.filter(task => task.id !== taskId)
@@ -318,6 +340,13 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
       return robot
     })
     
+    // If all tasks are now complete, stop simulation and score
+    if (updatedTasks.length === 0 && isRunning && simulationStartTime) {
+      const end = Date.now()
+      const duration = (end - simulationStartTime) / 1000
+      const score = Math.max(0, 1000 - Math.round(duration * 10))
+      set({ isRunning: false, simulationEndTime: end, score })
+    }
     set({ robots: updatedRobots, tasks: updatedTasks })
   },
 
@@ -326,6 +355,8 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   setMaxRobots: (max) => set({ maxRobots: max }),
 
   setChallengeModeEnabled: (enabled) => set({ challengeModeEnabled: enabled }),
+
+  getScore: () => get().score,
 }))
 
 // Utility function
