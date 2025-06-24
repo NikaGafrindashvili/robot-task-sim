@@ -41,15 +41,7 @@ export default function HomePage() {
         challengeId: currentChallengeId,
         score,
       })
-    } else {
-      console.log('Not calling setUserBestScore. Values:', {
-        score,
-        isRunning,
-        challengeModeEnabled,
-        currentChallengeId,
-        user,
-      })
-    }
+    } 
   }, [score, isRunning, challengeModeEnabled, currentChallengeId, user, setUserBestScore])
 
   return (
