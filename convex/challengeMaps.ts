@@ -136,20 +136,6 @@ export const bulkInsertChallengeMaps = mutation({
 });
 
 // Update existing challenge maps to remove robots
-export const clearRobotsFromAllChallengeMaps = mutation({
-  handler: async (ctx) => {
-    const allChallengeMaps = await ctx.db.query("challengeMaps").collect();
-    
-    for (const challengeMap of allChallengeMaps) {
-      await ctx.db.patch(challengeMap._id, {
-        robots: [],
-        updatedAt: Date.now(),
-      });
-    }
-    
-    return { success: true, updatedCount: allChallengeMaps.length };
-  },
-});
 
 // Force update challenge maps with new data (overwrites existing)
 export const forceUpdateChallengeMaps = mutation({

@@ -4,7 +4,6 @@ import { useEffect } from "react";
 
 export function useChallengeMaps() {
   const challengeMaps = useQuery(api.challengeMaps.getAllChallengeMaps);
-  const clearRobots = useMutation(api.challengeMaps.clearRobotsFromAllChallengeMaps);
   const bulkInsert = useMutation(api.challengeMaps.bulkInsertChallengeMaps);
   const addMaxRobots = useMutation(api.challengeMaps.addMaxRobotsToExistingMaps);
   const clearAndReseed = useMutation(api.challengeMaps.clearAndReseedChallengeMaps);
@@ -22,12 +21,13 @@ export function useChallengeMaps() {
           // Clear and reseed with correct implementation
           clearAndReseed().catch(console.error);
         } else {
-          // Database has maps, clear robots from all existing maps
-          clearRobots().catch(console.error);
+          // Only clear robots if any map actually has robots
+          const hasRobots = challengeMaps.some(map => map.robots && map.robots.length > 0);
+         
         }
       }
     }
-  }, [challengeMaps, clearRobots, bulkInsert, addMaxRobots, clearAndReseed]);
+  }, [challengeMaps, ,bulkInsert, addMaxRobots, clearAndReseed]);
 
   // Convert database format back to frontend format
   const formattedChallengeMaps = challengeMaps?.map(map => ({
