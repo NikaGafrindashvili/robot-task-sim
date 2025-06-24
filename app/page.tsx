@@ -11,6 +11,7 @@ import { useUserProfile } from '@/hooks/useUserProfile'
 import { useMutation } from 'convex/react'
 import { api } from '../convex/_generated/api'
 import React from 'react'
+import { useUserBestScore, useChallengeMap } from '@/hooks/useChallengeMaps'
 
 export default function HomePage() {
 
@@ -18,6 +19,8 @@ export default function HomePage() {
   const { score, isRunning, challengeModeEnabled, currentChallengeId } = useSimulationStore()
   const { user } = useUserProfile()
   const setUserBestScore = useMutation(api.challengeMaps.setUserBestScore)
+  const bestScore = useUserBestScore(user?._id, currentChallengeId || undefined)
+  const { challengeMap } = useChallengeMap(currentChallengeId || '')
 
   // Save best score when a challenge run ends
   React.useEffect(() => {
@@ -57,8 +60,23 @@ export default function HomePage() {
         </div>
         
         <div className="flex-1 flex flex-col justify-center items-center px-6 py-3">
-          {!isRunning && score !== null && (
-            <div className="text-3xl font-semibold text-black mb-4 text-center">
+          {challengeModeEnabled && currentChallengeId && challengeMap && (
+            <div className="mb-6 flex flex-col items-center ">
+              <div className="text-xl font-extrabold text-gralay-800 mb-1 text-center tracking-tight">
+                Challenge: <span className="font-black">{challengeMap.name}</span>
+              </div>
+              <div className="text-lg font-bold text-gray-700 mb-1 text-center">
+                Best Score: <span className="font-extrabold text-black">{bestScore}</span>
+              </div>
+              {!isRunning && score !== null && (
+                <div className="text-3xl font-black text-black mt-2 text-center">
+                  Score: {score}
+                </div>
+              )}
+            </div>
+          )}
+          {!challengeModeEnabled && !isRunning && score !== null && (
+            <div className="text-3xl font-black text-black mb-4 text-center">
               Score: {score}
             </div>
           )}

@@ -67,4 +67,12 @@ export function useChallengeMap(challengeId: string) {
     challengeMap: formattedChallengeMap,
     isLoading: challengeMap === undefined,
   };
+}
+
+export function useUserBestScore(userId: string | undefined, challengeId: string | undefined) {
+  const bestScore = useQuery(
+    api.challengeMaps.getUserBestScore,
+    userId && challengeId ? { userId, challengeId } : 'skip'
+  );
+  return bestScore?.score ?? 0;
 } 
