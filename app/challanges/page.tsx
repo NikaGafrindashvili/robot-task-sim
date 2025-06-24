@@ -113,7 +113,7 @@ export default function ChallangesPage() {
                       <div className="w-3 h-3 bg-blue-500 rounded mr-1"></div>
                       <span className="font-medium">Robots</span>
                     </div>
-                    <div className="text-gray-600">{challenge.robots?.length || 0}</div>
+                    <div className="text-gray-600">{challenge.robots?.length || 0}/{challenge.maxRobots}</div>
                   </div>
                   <div className="text-center">
                     <div className="flex items-center justify-center mb-1">

@@ -35,6 +35,7 @@ export type ChallengeMap = {
   tasks: Position[]
   obstacles: Position[]
   difficulty: 'Easy' | 'Medium' | 'Hard'
+  maxRobots: number
 }
 
 interface SimulationState {
@@ -49,6 +50,7 @@ interface SimulationState {
   lastAssignedRobotIndex: number
   placementMode: PlacementMode
   hasStarted: boolean
+  maxRobots: number
 
   // Actions
   setGridSize: (size: [number, number]) => void
@@ -70,6 +72,7 @@ interface SimulationState {
   assignTaskToRobot: (robotId: string, taskId: string, path: Position[]) => void
   completeTask: (robotId: string, taskId: string) => void
   setLastAssignedRobotIndex: (index: number) => void
+  setMaxRobots: (max: number) => void
 }
 
 export const useSimulationStore = create<SimulationState>((set, get) => ({
@@ -84,11 +87,19 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   lastAssignedRobotIndex: -1,
   placementMode: 'robot',
   hasStarted: false,
+  maxRobots: 10,
 
   setGridSize: (size) => set({ gridSize: size }),
 
   addRobot: (position) => {
-    const { robots, tasks, obstacles } = get()
+    const { robots, tasks, obstacles, maxRobots } = get()
+    
+    // Check robot limit
+    if (robots.length >= maxRobots) {
+      console.warn(`Cannot add more robots. Maximum allowed: ${maxRobots}`)
+      return
+    }
+    
     const occupied = robots.some(r => isSame(r.position, position)) || 
                      tasks.some(t => isSame(t.position, position)) ||
                      obstacles.some(o => isSame(o.position, position))
@@ -191,6 +202,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
       tasks: [],
       obstacles: [],
       lastAssignedRobotIndex: -1,
+      maxRobots: challengeMap.maxRobots,
     })
 
     // Create robots from positions (if provided)
@@ -303,6 +315,8 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   },
 
   setPlacementMode: (mode) => set({ placementMode: mode }),
+
+  setMaxRobots: (max) => set({ maxRobots: max }),
 }))
 
 // Utility function

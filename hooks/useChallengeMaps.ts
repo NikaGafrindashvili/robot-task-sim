@@ -1,36 +1,33 @@
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { challengeMaps as staticChallengeMaps } from "@/lib/challengeMaps";
 import { useEffect } from "react";
 
 export function useChallengeMaps() {
   const challengeMaps = useQuery(api.challengeMaps.getAllChallengeMaps);
   const clearRobots = useMutation(api.challengeMaps.clearRobotsFromAllChallengeMaps);
   const bulkInsert = useMutation(api.challengeMaps.bulkInsertChallengeMaps);
+  const addMaxRobots = useMutation(api.challengeMaps.addMaxRobotsToExistingMaps);
+  const clearAndReseed = useMutation(api.challengeMaps.clearAndReseedChallengeMaps);
   
   // Seed database and clear robots from existing maps
   useEffect(() => {
     if (challengeMaps !== undefined) {
       if (challengeMaps.length === 0) {
-        // Database is empty, insert new challenge maps
-        const dbChallengeMaps = staticChallengeMaps.map(map => ({
-          challengeId: map.id,
-          name: map.name,
-          description: map.description,
-          difficulty: map.difficulty,
-          gridSize: map.gridSize,
-          robots: map.robots,
-          tasks: map.tasks,
-          obstacles: map.obstacles,
-        }));
-        
-        bulkInsert({ challengeMaps: dbChallengeMaps }).catch(console.error);
+        // Database is empty, seed with challenge maps
+        clearAndReseed().catch(console.error);
       } else {
-        // Database has maps, clear robots from all existing maps
-        clearRobots().catch(console.error);
+        // Check if any challenge map is missing maxRobots field
+        const needsMaxRobots = challengeMaps.some(map => map.maxRobots === undefined);
+        if (needsMaxRobots) {
+          // Clear and reseed with correct implementation
+          clearAndReseed().catch(console.error);
+        } else {
+          // Database has maps, clear robots from all existing maps
+          clearRobots().catch(console.error);
+        }
       }
     }
-  }, [challengeMaps, clearRobots, bulkInsert]);
+  }, [challengeMaps, clearRobots, bulkInsert, addMaxRobots, clearAndReseed]);
 
   // Convert database format back to frontend format
   const formattedChallengeMaps = challengeMaps?.map(map => ({
@@ -42,6 +39,7 @@ export function useChallengeMaps() {
     robots: (map.robots || []) as [number, number][],
     tasks: map.tasks as [number, number][],
     obstacles: map.obstacles as [number, number][],
+    maxRobots: map.maxRobots || 5, // fallback to 5 if not set
   })) || [];
 
   return {
@@ -62,6 +60,7 @@ export function useChallengeMap(challengeId: string) {
     robots: (challengeMap.robots || []) as [number, number][],
     tasks: challengeMap.tasks as [number, number][],
     obstacles: challengeMap.obstacles as [number, number][],
+    maxRobots: challengeMap.maxRobots || 5, // fallback to 5 if not set
   } : null;
 
   return {

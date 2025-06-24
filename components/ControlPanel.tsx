@@ -28,11 +28,15 @@ export default function ControlPanel() {
     setPlacementMode,
     gridSize,
     setGridSize,
+    maxRobots,
+    setMaxRobots,
   } = useSimulationStore()
 
   const [showWarning, setShowWarning] = useState(false)
+  const [showRobotLimitWarning, setShowRobotLimitWarning] = useState(false)
   const [rows, setRows] = useState(gridSize[0])
   const [cols, setCols] = useState(gridSize[1])
+  const [maxRobotsInput, setMaxRobotsInput] = useState(maxRobots)
 
   const handleInputChange =
     (setter: (value: number) => void) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,6 +58,28 @@ export default function ControlPanel() {
       setShowWarning(false)
     }
   }, [robots.length, tasks.length])
+
+  // Show robot limit warning when trying to add robots at limit
+  useEffect(() => {
+    if (robots.length >= maxRobots && placementMode === 'robot') {
+      setShowRobotLimitWarning(true)
+      const timer = setTimeout(() => setShowRobotLimitWarning(false), 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [robots.length, maxRobots, placementMode])
+
+  useEffect(() => {
+    setMaxRobotsInput(maxRobots)
+  }, [maxRobots])
+
+  const handleMaxRobotsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const sanitized = e.target.value.replace(/[^0-9]/g, '')
+    setMaxRobotsInput(sanitized === '' ? 1 :parseInt(sanitized))
+  }
+
+  const handleMaxRobotsUpdate = () => {
+    setMaxRobots(maxRobotsInput)
+  }
 
   const handleStart = () => {
     if (robots.length === 0 || tasks.length === 0) {
@@ -92,6 +118,26 @@ export default function ControlPanel() {
           Add at least one robot and one task to start the simulation.
         </div>
       )}
+
+      {showRobotLimitWarning && (
+        <div className="text-sm text-orange-600 bg-orange-50 border border-orange-200 rounded px-3 py-2 mt-2">
+          Robot limit reached ({robots.length}/{maxRobots}). Cannot add more robots.
+        </div>
+      )}
+
+      {/* Robot Limit Display */}
+      <div className="text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded px-3 py-2">
+        <div className="flex justify-between items-center">
+          <span>Robots:</span>
+          <span className={`font-medium ${robots.length >= maxRobots ? 'text-orange-600' : 'text-gray-800'}`}>
+            {robots.length}/{maxRobots}
+          </span>
+        </div>
+        <div className="flex justify-between items-center mt-1">
+          <span>Tasks:</span>
+          <span className="font-medium text-gray-800">{tasks.length}</span>
+        </div>
+      </div>
 
       <div>
         <label className="block font-medium mb-1">Speed</label>
@@ -163,6 +209,28 @@ export default function ControlPanel() {
         </div>
       </div>
 
+      <div>
+        <label className="block font-medium mb-2">Max Robots</label>
+        <div className="flex items-end gap-2">
+          <input
+            type="text"
+            inputMode="numeric"
+            value={maxRobotsInput}
+            onChange={handleMaxRobotsChange}
+            className="w-20 h-9 border border-gray-300 rounded text-center bg-gray-50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={isRunning}
+          />
+          <Button
+            variant="secondary"
+            onClick={handleMaxRobotsUpdate}
+            disabled={isRunning}
+            className="h-9"
+          >
+            Update
+          </Button>
+        </div>
+      </div>
+
       <div className="flex items-center gap-2">
         <Switch checked={dynamicTaskSpawning} onCheckedChange={toggleDynamicTaskSpawning} />
         <span>Auto Tasks</span>
@@ -181,8 +249,11 @@ export default function ControlPanel() {
             className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
               placementMode === 'robot'
                 ? 'bg-blue-600 text-white'
+                : robots.length >= maxRobots
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
+            disabled={robots.length >= maxRobots}
           >
             <Bot className="w-4 h-4 mr-1 inline" />
             Robot

@@ -23,6 +23,7 @@ export default defineSchema({
     robots: v.optional(v.array(v.array(v.number()))),
     tasks: v.array(v.array(v.number())),
     obstacles: v.array(v.array(v.number())),
+    maxRobots: v.number(),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
