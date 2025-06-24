@@ -7,18 +7,47 @@ import Footer from '@/components/Footer'
 import { useSimulationRunner } from '@/hooks/useSimulationRunner'
 import SimulationGridControls from '@/components/SimulationGridControls'
 import { useSimulationStore } from '@/store/simulationStore'
-import { useEffect } from 'react'
+import { useUserProfile } from '@/hooks/useUserProfile'
+import { useMutation } from 'convex/react'
+import { api } from '../convex/_generated/api'
+import React from 'react'
 
 export default function HomePage() {
 
   useSimulationRunner()
-  const { score, isRunning, resetSimulation } = useSimulationStore()
+  const { score, isRunning, challengeModeEnabled, currentChallengeId } = useSimulationStore()
+  const { user } = useUserProfile()
+  const setUserBestScore = useMutation(api.challengeMaps.setUserBestScore)
 
-  useEffect(() => {
-    return () => {
-      resetSimulation()
+  // Save best score when a challenge run ends
+  React.useEffect(() => {
+    if (
+      score !== null &&
+      !isRunning &&
+      challengeModeEnabled &&
+      currentChallengeId &&
+      user && user._id
+    ) {
+      console.log('Calling setUserBestScore with:', {
+        userId: user._id,
+        challengeId: currentChallengeId,
+        score,
+      })
+      setUserBestScore({
+        userId: user._id,
+        challengeId: currentChallengeId,
+        score,
+      })
+    } else {
+      console.log('Not calling setUserBestScore. Values:', {
+        score,
+        isRunning,
+        challengeModeEnabled,
+        currentChallengeId,
+        user,
+      })
     }
-  }, [resetSimulation])
+  }, [score, isRunning, challengeModeEnabled, currentChallengeId, user, setUserBestScore])
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">

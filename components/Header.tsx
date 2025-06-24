@@ -2,18 +2,25 @@
 import { useSimulationStore } from '@/store/simulationStore'
 import { Bot, Target, Timer, Zap } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { Button } from './ui/button'
 import { AuthButtons } from './AuthButtons'
 
 export default function Header() {
-  const { robots, tasks, isRunning, tickSpeed } = useSimulationStore()
+  const { robots, tasks, isRunning, tickSpeed, resetSimulation } = useSimulationStore()
   
   const idleRobots = robots.filter(robot => !robot.targetTaskId).length
   const busyRobots = robots.filter(robot => robot.targetTaskId).length
   const availableTasks = tasks.filter(task => !task.assigned).length
   const assignedTasks = tasks.filter(task => task.assigned).length
   const pathname = usePathname()
+  const router = useRouter()
+
+  const handleChallengesClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    resetSimulation()
+    router.push('/challanges')
+  }
 
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4">
@@ -34,15 +41,13 @@ export default function Header() {
               <span>Home</span>
             </Button>
           </Link>
-          <Link href="/challanges" >
-            <Button
-              variant={pathname.startsWith('/challanges') ? 'default' : 'ghost'}
-              className="text-sm font-medium px-4 py-2"
-              asChild
-            >
-              <span>Challanges</span>
-            </Button>
-          </Link>
+          <Button
+            variant={pathname.startsWith('/challanges') ? 'default' : 'ghost'}
+            className="text-sm font-medium px-4 py-2"
+            onClick={handleChallengesClick}
+          >
+            Challanges
+          </Button>
         </nav>
         
         {/* Right: Status/auth */}

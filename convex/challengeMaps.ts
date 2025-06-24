@@ -428,4 +428,44 @@ export const clearAndReseedChallengeMaps = mutation({
     
     return { success: true, deletedCount: allChallengeMaps.length, insertedCount: results.length };
   },
-}); 
+});
+
+// Get a user's best score for a challenge map
+export const getUserBestScore = query({
+  args: { userId: v.string(), challengeId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("userScores")
+      .withIndex("by_user_challenge", (q) => q.eq("userId", args.userId).eq("challengeId", args.challengeId))
+      .first();
+  },
+});
+
+// Set a user's best score for a challenge map (only if new score is higher)
+export const setUserBestScore = mutation({
+  args: { userId: v.string(), challengeId: v.string(), score: v.number() },
+  handler: async (ctx, args) => {
+    const now = Date.now();
+    const existing = await ctx.db
+      .query("userScores")
+      .withIndex("by_user_challenge", (q) => q.eq("userId", args.userId).eq("challengeId", args.challengeId))
+      .first();
+    if (existing) {
+      if (args.score > existing.score) {
+        await ctx.db.patch(existing._id, { score: args.score, updatedAt: now });
+        return { updated: true, score: args.score };
+      } else {
+        return { updated: false, score: existing.score };
+      }
+    } else {
+      await ctx.db.insert("userScores", {
+        userId: args.userId,
+        challengeId: args.challengeId,
+        score: args.score,
+        createdAt: now,
+        updatedAt: now,
+      });
+      return { updated: true, score: args.score };
+    }
+  },
+});

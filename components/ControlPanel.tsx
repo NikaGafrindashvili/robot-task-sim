@@ -67,6 +67,8 @@ export default function ControlPanel() {
       setShowRobotLimitWarning(true)
       const timer = setTimeout(() => setShowRobotLimitWarning(false), 3000)
       return () => clearTimeout(timer)
+    } else if (robots.length < maxRobots) {
+      setShowRobotLimitWarning(false)
     }
   }, [robots.length, maxRobots, placementMode])
 

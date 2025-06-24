@@ -29,4 +29,13 @@ export default defineSchema({
   })
     .index("by_difficulty", ["difficulty"])
     .index("by_challenge_id", ["challengeId"]),
+  
+  userScores: defineTable({
+    userId: v.string(),
+    challengeId: v.string(),
+    score: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user_challenge", ["userId", "challengeId"]),
 }); 

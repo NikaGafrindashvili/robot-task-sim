@@ -55,6 +55,7 @@ interface SimulationState {
   simulationStartTime: number | null
   simulationEndTime: number | null
   score: number | null
+  currentChallengeId: string | null
 
   // Actions
   setGridSize: (size: [number, number]) => void
@@ -98,6 +99,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   simulationStartTime: null,
   simulationEndTime: null,
   score: null,
+  currentChallengeId: null,
 
   setGridSize: (size) => set({ gridSize: size }),
 
@@ -165,7 +167,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
     })
   },
 
-  clearGrid: () => set({ robots: [], tasks: [], obstacles: [], challengeModeEnabled: false }),
+  clearGrid: () => set({ robots: [], tasks: [], obstacles: [], challengeModeEnabled: false, currentChallengeId: null }),
 
   randomizeLayout: () => {
     const [rows, cols] = get().gridSize
@@ -205,7 +207,6 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   },
 
   loadChallengeMap: (challengeMap) => {
-    // Reset simulation first
     set({
       isRunning: false,
       hasStarted: false,
@@ -216,6 +217,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
       lastAssignedRobotIndex: -1,
       maxRobots: challengeMap.maxRobots,
       challengeModeEnabled: true,
+      currentChallengeId: challengeMap.id,
     })
 
     // Create robots from positions (if provided)
@@ -279,6 +281,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
       simulationStartTime: null,
       simulationEndTime: null,
       score: null,
+      currentChallengeId: null,
     })
   },
 
